@@ -1,5 +1,5 @@
 # filter-multi-select
-<p>Multiple select dropdown with filter JQuery plugin.</p>
+<p>Multiple select dropdown with filter jQuery plugin.</p>
 
 <p>Improve useability of HTML <code>&ltselect&gt</code> tags:
 <ul>
@@ -16,22 +16,27 @@
 # Usage
 <p>
   <ol>
-    <li>Load the plugin bundle in your HTML code.</li>   
+    <li>Load jQuery, Bootstrap, and the plugin bundle in your HTML code.
+    <pre><code>&ltscript src="https://code.jquery.com/jquery-3.2.1.slim.min.js"&gt&lt/script&gt
+&ltlink rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/&gt
+...
+&ltlink rel="stylesheet" href="filter_multi_select.css"/&gt
+&ltscript src="filter-multi-select-bundle.min.js"&gt&lt/script&gt</code></pre></li>
     <li>Define a <code>&ltselect&gt</code> block with <i>name</i> and <i>multiple</i> attributes in your HTML code.  Supported optional attributes: <i>disabled</i> - disables the dropdown.</li>  
-    <li>Define <code>&ltoption&gt</code>'s with unique <i>value</i> attributes.  Supported optional attributes: <i>label</i> - alternate dropdown display text; <i>selected</i> - pre-select this option; <i>disabled</i> - disable this option.</li>
+    <li>Define <code>&ltoption&gt</code>'s with unique <i>value</i> attributes.  Supported optional attributes: <i>label</i> - alternate dropdown display text; <i>selected</i> - pre-select this option; <i>disabled</i> - disable this option.
     <pre><code>&ltform&gt
   ...
   &ltselect id="pets" name="pets" multiple&gt
     &ltoption value="0"&gtDoge&lt/option&gt
     &ltoption value="1" selected&gtKeyboard Cat&lt/option&gt
     &ltoption value="2" disabled&gtBadger Badger Badger&lt/option&gt
-    ...</code></pre>
-    <li>Use JQuery to target the <code>&ltselect&gt</code> and apply the plugin.</li>
+    ...</code></pre></li>
+    <li>Use JQuery to target the <code>&ltselect&gt</code> and apply the plugin.
     <pre><code>&ltscript&gt
   $(function () {
     $('#pets').filterMultiSelect();
   });
-&lt/script&gt</code></pre>
+&lt/script&gt</code></pre></li>
   </ol>
 </p>
 
