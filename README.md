@@ -31,7 +31,7 @@
     &ltoption value="1" selected&gtKeyboard Cat&lt/option&gt
     &ltoption value="2" disabled&gtBadger Badger Badger&lt/option&gt
     ...</code></pre></li>
-    <li>Use JQuery to target the <code>&ltselect&gt</code> and apply the plugin.
+    <li>Use jQuery to target the <code>&ltselect&gt</code> and apply the plugin.
     <pre><code>&ltscript&gt
   $(function () {
     $('#pets').filterMultiSelect();
