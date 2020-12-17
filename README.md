@@ -1,7 +1,7 @@
 # filter-multi-select
 <p>Multiple select dropdown with filter jQuery plugin.</p>
 
-<p>Improve useability of HTML <code>&ltselect&gt</code> tags:
+<p>Improve the useability of HTML <code>&ltselect&gt</code> elements:
 <ul>
   <li>options are displayed in a dropdown list.</li>
   <li>selected options are marked with a checkbox in the list and a badge at the top.</li>
