@@ -51,12 +51,17 @@
 <p>The following methods are exposed on the plugin:
   <ul>
     <li><code>hasOption(value:string></code> - returns true if this dropdown has an option with the specified <i>value</i> attribute, otherwise false.</li>
-    <li><code>selectOption(value:string)</code> - selects the option with the specified <i>value</i> attribute, or does nothing if it does not exist.</li>
-    <li><code>deselectOption(value:string)</code> - deselects the option with the specified <i>value</i> attribute, or does nothing if it does not exist.</li>
-    <li><code>isOptionSelected</code> - returns true if the option with the specified <i>value</i> attribute is selected, otherwise false or if it does not exist.</li>
-    <li><code<</li>
-    <li></li>
-    <li></li>
+    <li><code>selectOption(value:string)</code> - selects the option with the specified <i>value</i> attribute, otherwise does nothing if it does not exist or if it is disabled.</li>
+    <li><code>deselectOption(value:string)</code> - deselects the option with the specified <i>value</i> attribute, otherwise does nothing if it does not exist or if it is disabled.</li>
+    <li><code>isOptionSelected(value:string)</code> - returns true if the option with the specified <i>value</i> attribute exists and is selected, otherwise false.</li>
+    <li><code>enableOption(value:string)</code> - enables the option with the specified <i>value</i> attribute, otherwise does nothing if it does not exist or if enabling is not permitted.</li>
+    <li><code>disableOption(value:string)</code> - disables the option with the specified <i>value</i> attribute, otherwise does nothing if it does not exist or if disabling is not permitted.</li>
+    <li><code>isOptionDisabled(value:string)</code> - returns true if the option with the specified <i>value</i> attribute exists and is disabled, otherwise false.</li>
+    <li><code>enable()</code> - enables this dropdown, otherwise does nothing if enabling is not permitted.</li>
+    <li><code>disable()</code> - disables this dropdown, otherwise does nothing if disabling is not permitted.</li>
+    <li><code>selectAll()</code> - selects all non-disabled options.</li>
+    <li><code>deselectAll()</code> - deselects all non-disabled options.</li>
+    <li><code>getSelectedOptionsAsJson(includeDisabled=true)</code> - returns a JSON string of the selected options' values.</li>
   </ul>
 </p>
   
