@@ -16,6 +16,7 @@
 # Usage
 <p>
   <ol>
+    <li>Load the plugin bundle in your HTML code.</li>   
     <li>Define a <code>&ltselect&gt</code> block with <i>name</i> and <i>multiple</i> attributes in your HTML code.  Supported optional attributes: <i>disabled</i> - disables the dropdown.</li>  
     <li>Define <code>&ltoption&gt</code>'s with unique <i>value</i> attributes.  Supported optional attributes: <i>label</i> - alternate dropdown display text; <i>selected</i> - pre-select this option; <i>disabled</i> - disable this option.</li>
     <pre><code>&ltform&gt
