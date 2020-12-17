@@ -56,7 +56,7 @@
 # Methods
 <p>The following methods are exposed on the plugin:
   <ul>
-    <li><code>hasOption(value:string></code> - returns true if this dropdown has an option with the specified <i>value</i> attribute, otherwise false.</li>
+    <li><code>hasOption(value:string)</code> - returns true if this dropdown has an option with the specified <i>value</i> attribute, otherwise false.</li>
     <li><code>selectOption(value:string)</code> - selects the option with the specified <i>value</i> attribute, otherwise does nothing if it does not exist or if it is disabled.</li>
     <li><code>deselectOption(value:string)</code> - deselects the option with the specified <i>value</i> attribute, otherwise does nothing if it does not exist or if it is disabled.</li>
     <li><code>isOptionSelected(value:string)</code> - returns true if the option with the specified <i>value</i> attribute exists and is selected, otherwise false.</li>
