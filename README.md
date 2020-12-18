@@ -38,6 +38,9 @@
   });
 &lt/script&gt</code></pre></li>
   </ol>
+  <p align="center">
+    <img src="./screenshot3.png" width="489" title="screenshot">
+  </p>
 </p>
 
 # Options
