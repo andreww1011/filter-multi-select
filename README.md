@@ -12,6 +12,10 @@
 </ul>
 </p>
 <p>Uses Bootstrap classes for styling.  Easily modify CSS to match your theme.</p>
+<p align="center">
+    <img src="./screenshot2.png" width="401" title="screenshot2"/>
+    <img src="./screenshot3.png" width="401" title="screenshot3"/>
+</p>
 
 # Usage
 <p>
@@ -39,7 +43,7 @@
 &lt/script&gt</code></pre></li>
   </ol>
   <p align="center">
-    <img src="./screenshot3.png" width="489" title="screenshot">
+    <img src="./screenshot.png" width="489" title="screenshot">
   </p>
 </p>
 
