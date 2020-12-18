@@ -1,0 +1,32 @@
+{
+  "name": "filter-multi-select",
+  "version": "1.0.0",
+  "description": "Multiple select dropdown with filter jQuery plugin.",
+  "scripts": {
+    "clean": "rimraf dist && rimraf coverage",
+    "build": "npm run compile:js && npm run copy:html && npm run bundle && npm run minify",
+    "cleanbuild": "npm run clean && npm run build",
+    "compile:js": "tsc",
+    "copy:html": "cpx 'src/**.{html,css}' dist",
+    "bundle": "rollup -c",
+    "minify": "uglifyjs dist/filter-multi-select-bundle.js --output dist/filter-multi-select-bundle.min.js --source-map dist/filter-multi-select-bundle.min.js.map --source-map-url filter-multi-select-bundle.min.js.map --in-source-map dist/filter-multi-select-bundle.js.map"
+  },
+  "author": {
+    "name": "Andrew Wagner"
+  },
+  "license": "LGPLv2.1",
+  "dependencies": {
+    "@babel/core": "^7.12.9",
+    "@types/bootstrap": "^5.0.1",
+    "@types/jquery": "^3.5.4",
+    "bootstrap": "^3.2.1",
+    "cpx": "^1.5.0",
+    "jquery": "~3.5.1",
+    "node-sass": "^5.0.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.34.0",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "uglify": "^0.1.5"
+  }
+}
