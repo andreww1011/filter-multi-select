@@ -29,7 +29,7 @@
   &ltselect id="pets" name="pets" multiple&gt
     &ltoption value="0"&gtDoge&lt/option&gt
     &ltoption value="1" selected&gtKeyboard Cat&lt/option&gt
-    &ltoption value="2" disabled&gtBadger Badger Badger&lt/option&gt
+    &ltoption value="2" label="Badger" disabled&gtBadger Badger Badger&lt/option&gt
     ...</code></pre></li>
     <li>Use jQuery to target the <code>&ltselect&gt</code> and apply the plugin.
     <pre><code>&ltscript&gt
