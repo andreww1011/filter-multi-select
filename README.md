@@ -26,7 +26,7 @@
     <li>Define <code>&ltoption&gt</code>'s with unique <i>value</i> attributes.  Supported optional attributes: <i>label</i> - alternate dropdown display text; <i>selected</i> - pre-select this option; <i>disabled</i> - disable this option.
     <pre><code>&ltform&gt
   ...
-  &ltselect id="pets" name="pets" multiple&gt
+  &ltselect multiple id="pets" name="pets"&gt
     &ltoption value="0"&gtDoge&lt/option&gt
     &ltoption value="1" selected&gtKeyboard Cat&lt/option&gt
     &ltoption value="2" label="Badger" disabled&gtBadger Badger Badger&lt/option&gt
