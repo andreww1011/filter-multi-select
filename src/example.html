@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Filter Multi Select Plugin</title>
+  </head>
+
+  <body>
+    <!-- Load jQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <!-- Load Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Load the plugin bundle. -->
+    <link rel="stylesheet" href="filter_multi_select.css" />
+    <script src="filter-multi-select-bundle.min.js"></script>
+
+    <section class="alternate page-heading">
+      <div class="container">
+        <header>
+          <h1>Dropdown Filter Multi-select jQuery plugin</h1>
+        </header>
+        <p class="lead"></p>
+    </section>
+    <hr>
+    <div class="container">
+      <p>Click below to open dropdown.<br />
+        Use up/down arrow to focus item and space/enter to select.<br />
+        Type to filter items. Press esc to clear or close.<br />
+        If only one item is showing, press enter to select.<br />
+        Tab/shift-tab to close and cycle to next dropdown.
+      </p>
+    </div>
+    <form class="container" method="GET" id="form">
+      <div class="row">
+        <h4 class="col-12">Default Dropdown</h4>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="animals">Animals</label>
+        <div class="col-10">
+          <select multiple name="animals" id="animals">
+            <option value="bear">Bear</option>
+            <option value="ant">Ant</option>
+            <option value="salamander">Salamander</option>
+            <option value="owl">Owl</option>
+            <option value="frog">Frog</option>
+            <option value="shark">Shark</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Dropdown with pre-sets and case-sensitive filtering</h4>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="shapes">Shapes</label>
+        <div class="col-10">
+          <select multiple name="shapes" id="shapes">
+            <option value="1" selected>Square</option>
+            <option value="2">circle</option>
+            <option value="3">polygon</option>
+            <option value="4">Ellipse</option>
+            <option value="5">Triangle</option>
+            <option value="6" label="rect" selected>Rectangle</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Dropdown with disabled items</h4>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="cars">Cars</label>
+        <div class="col-10">
+          <select multiple name="cars" id="cars">
+            <option value="1" selected>Toyota</option>
+            <option value="2">Honda</option>
+            <option value="3">Ford</option>
+            <option value="4" disabled >BMW</option>
+            <option value="5" selected disabled label="Chevy">Chevrolet</option>
+            <option value="6">Kia</option>
+            <option value="7">Mercedes</option>
+            <option value="8">Subaru</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Dropdown with all items disabled</h4>
+        <div class="container">
+          <button id="b1" type="button">enable Java</button>
+          <button id="b2" type="button">disable Java</button>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="programming_languages_1">Programming Languages</label>
+        <div class="col-10">
+          <select multiple name="programming_languages_1" id="programming_languages_1">
+            <option value="1" disabled selected>Java</option>
+            <option value="2" disabled>Python</option>
+            <option value="3" disabled label="JS">Javascript</option>
+            <option value="4" disabled>C++</option>
+            <option value="5" disabled>Ruby</option>
+            <option value="6" disabled>Fortran</option>
+            <option value="7" disabled selected>Haskell</option>
+            <option value="8" disabled>C#</option>
+            <option value="9" disabled>Basic</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Disabled Dropdown</h4>
+        <div class="container">
+          <button id="b3" type="button">enable dropdown</button>
+          <button id="b4" type="button">disable dropdown</button>
+          <p>...but java is still disabled.<br /></p>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="programming_languages_2">Programming Languages</label>
+        <div class="col-10">
+          <select multiple disabled name="programming_languages_2" id="programming_languages_2">
+            <option value="1" disabled selected>Java</option>
+            <option value="2">Python</option>
+            <option value="3" label="JS">Javascript</option>
+            <option value="4">C++</option>
+            <option value="5">Ruby</option>
+            <option value="6">Fortran</option>
+            <option value="7" selected>Haskell</option>
+            <option value="8">C#</option>
+            <option value="9">Basic</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Dropdown with enabling/disabling not permitted</h4>
+        <div class="container">
+          <button id="b5" type="button">enable Java</button>
+          <button id="b6" type="button">disable Java</button>
+          <button id="b7" type="button">enable dropdown</button>
+          <button id="b8" type="button">disable dropdown</button>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="programming_languages_3">Programming Languages</label>
+        <div class="col-10">
+          <select multiple name="programming_languages_3" id="programming_languages_3">
+            <option value="1" disabled selected>Java</option>
+            <option value="2">Python</option>
+            <option value="3" label="JS">Javascript</option>
+            <option value="4">C++</option>
+            <option value="5">Ruby</option>
+            <option value="6">Fortran</option>
+            <option value="7" selected>Haskell</option>
+            <option value="8">C#</option>
+            <option value="9">Basic</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Dropdown with items added via js</h4>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="cities">Cities</label>
+        <div class="col-10">
+          <select multiple name="cities" id="cities">
+            <option value="1">London</option>
+            <option value="2" selected >New York</option>
+            <option value="3" selected disabled>Los Angeles</option>
+            <option value="4" disabled>Paris</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit">Submit Form</button>
+    </form>
+    <div class="container">
+      <button id="jsonbtn1">Get Json (include disabled)</button>
+    </div>
+    <div class="container">
+      <span id="jsonresult1"></span>
+    </div>
+    <div class="container">
+      <button id="jsonbtn2">Get Json (exclude disabled)</button>
+    </div>
+    <div class="container">
+      <span id="jsonresult2"></span>
+    </div>
+    <script>
+      // Use the plugin once the DOM has been loaded.
+      $(function () {
+        // Apply the plugin 
+        var animals = $('#animals').filterMultiSelect();
+        var shapes = $('#shapes').filterMultiSelect({
+          selectAllText: 'all...',
+          placeholderText: 'click to select a shape',
+          filterText: 'search',
+          caseSensitive: true,
+        });
+        var cars = $('#cars').filterMultiSelect();
+        var pl1 = $('#programming_languages_1').filterMultiSelect();
+        $('#b1').click((e) => {
+          var x = pl1.getOption("1");
+          x.enable();
+        });
+        $('#b2').click((e) => {
+          pl1.getOption("1").disable();
+        });
+        var pl2 = $('#programming_languages_2').filterMultiSelect();
+        $('#b3').click((e) => {
+          pl2.enable();
+        });
+        $('#b4').click((e) => {
+          pl2.disable();
+        });
+        var pl3 = $('#programming_languages_3').filterMultiSelect({
+          allowEnablingAndDisabling: false,
+        });
+        $('#b5').click((e) => {
+          var x = pl3.getOption("1");
+          x.enable();
+        });
+        $('#b6').click((e) => {
+          pl3.getOption("1").disable();
+        });
+        $('#b7').click((e) => {
+          pl3.enable();
+        });
+        $('#b8').click((e) => {
+          pl3.disable();
+        });
+        var cities = $('#cities').filterMultiSelect({
+          items: [["San Francisco","a"],
+                  ["Milan","b",false,true],
+                  ["Singapore","c",true],
+                  ["Berlin","d",true,true],
+                 ],
+        });
+        $('#jsonbtn1').click((e) => {
+          var b = true;
+          var result = {
+            ...JSON.parse(animals.getSelectedOptionsJson(b)),
+            ...JSON.parse(shapes.getSelectedOptionsJson(b)),
+            ...JSON.parse(cars.getSelectedOptionsJson(b)),
+            ...JSON.parse(pl1.getSelectedOptionsJson(b)),
+            ...JSON.parse(pl2.getSelectedOptionsJson(b)),
+            ...JSON.parse(pl3.getSelectedOptionsJson(b)),
+            ...JSON.parse(cities.getSelectedOptionsJson(b)),
+          }
+          $('#jsonresult1').text(JSON.stringify(result,null,"  "));
+        });
+        $('#jsonbtn2').click((e) => {
+          var b = false;
+          var result = {
+            ...JSON.parse(animals.getSelectedOptionsJson(b)),
+            ...JSON.parse(shapes.getSelectedOptionsJson(b)),
+            ...JSON.parse(cars.getSelectedOptionsJson(b)),
+            ...JSON.parse(pl1.getSelectedOptionsJson(b)),
+            ...JSON.parse(pl2.getSelectedOptionsJson(b)),
+            ...JSON.parse(pl3.getSelectedOptionsJson(b)),
+            ...JSON.parse(cities.getSelectedOptionsJson(b)),
+          }
+          $('#jsonresult2').text(JSON.stringify(result,null,"  "));
+        });
+        $('#form').on('keypress keyup', function(e) {
+          var keyCode = e.keyCode || e.which;
+          if (keyCode === 13) { 
+            e.preventDefault();
+            return false;
+          }
+        });
+      });
+    </script>
+  </body>
+
+</html>
+
