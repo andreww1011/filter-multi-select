@@ -28,7 +28,9 @@
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
     }();
-    var NULL_OPTION = new (function () {
+    var NULL_OPTION = new (
+    /** @class */
+    function () {
       function class_1() {}
 
       class_1.prototype.initialize = function () {};
@@ -78,7 +80,9 @@
       return class_1;
     }())();
 
-    var FilterMultiSelect = function () {
+    var FilterMultiSelect =
+    /** @class */
+    function () {
       function FilterMultiSelect(selectTarget, args) {
         var _this = this;
 
@@ -115,9 +119,11 @@
             case "Enter":
             case "Spacebar":
             case " ":
+              //swallow to allow checkbox change to work
               break;
 
             default:
+              //send key to filter
               _this.refocusFilter();
 
               break;
@@ -167,7 +173,8 @@
         this.name = name;
         var array = selectTarget.find('option').toArray();
         this.options = FilterMultiSelect.createOptions(this, name, array, args.items);
-        this.selectAllOption = FilterMultiSelect.createSelectAllOption(this, name, args.selectAllText);
+        this.selectAllOption = FilterMultiSelect.createSelectAllOption(this, name, args.selectAllText); // filter box
+
         this.filterInput = document.createElement('input');
         this.filterInput.type = 'text';
         this.filterInput.placeholder = args.filterText;
@@ -175,17 +182,21 @@
         this.clearButton.type = 'button';
         this.clearButton.innerHTML = '&times;';
         this.filter = document.createElement('div');
-        this.filter.append(this.filterInput, this.clearButton);
+        this.filter.append(this.filterInput, this.clearButton); // items
+
         this.items = document.createElement('div');
         this.items.append(this.selectAllOption.getListItem());
         this.options.forEach(function (o) {
           return _this.items.append(o.getListItem());
-        });
+        }); // dropdown list
+
         this.dropDown = document.createElement('div');
-        this.dropDown.append(this.filter, this.items);
+        this.dropDown.append(this.filter, this.items); // placeholder
+
         this.placeholder = document.createElement('span');
         this.placeholder.textContent = args.placeholderText;
-        this.selectedItems = document.createElement('span');
+        this.selectedItems = document.createElement('span'); // viewbar
+
         this.viewBar = document.createElement('div');
         this.viewBar.append(this.placeholder, this.selectedItems);
         this.div = document.createElement('div');
@@ -197,7 +208,7 @@
         this.filterText = '';
         this.showing = new Array();
         this.focusable = new Array();
-        this.itemFocus = -2;
+        this.itemFocus = -2; //magic number
       }
 
       FilterMultiSelect.createOptions = function (fms, name, htmlOptions, jsOptions) {
@@ -235,7 +246,9 @@
       };
 
       FilterMultiSelect.createSelectAllOption = function (fms, name, label) {
-        return new (function (_super) {
+        return new (
+        /** @class */
+        function (_super) {
           __extends(class_2, _super);
 
           function class_2() {
@@ -336,7 +349,7 @@
           switch (e.key) {
             case "Enter":
               if (numShown === 1) {
-                var o = _this.options[_this.showing[0]];
+                var o = _this.options[_this.showing[0]]; //magic number
 
                 if (!o.isDisabled()) {
                   if (o.isSelected()) {
@@ -389,6 +402,7 @@
         if (this.caseSensitive) {
           this.options.forEach(function (o, i) {
             if (o.getLabel().indexOf(text) !== -1) {
+              //magic number
               o.show();
               showing.push(i);
 
@@ -402,6 +416,7 @@
         } else {
           this.options.forEach(function (o, i) {
             if (o.getLabel().toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+              //magic number 
               o.show();
               showing.push(i);
 
@@ -429,7 +444,7 @@
       FilterMultiSelect.prototype.refocusFilter = function () {
 
         this.filterInput.focus();
-        this.itemFocus = -2;
+        this.itemFocus = -2; //magic number
       };
 
       FilterMultiSelect.prototype.attachViewbarListeners = function () {
@@ -469,7 +484,8 @@
         this.dropDown.classList.remove('show');
         setTimeout(function () {
           _this.setTabIndex();
-        }, 100);
+        }, 100); //magic number
+
         this.div.addEventListener('mousedown', this.fmsMousedownListener, true);
         this.div.addEventListener('focus', this.fmsFocusListener);
       };
@@ -479,15 +495,18 @@
         this.itemFocus++;
 
         if (this.itemFocus == -1 && this.selectAllOption.isHidden()) {
+          //magic number
           this.itemFocus++;
         }
       };
 
       FilterMultiSelect.prototype.decrementItemFocus = function () {
-        if (this.itemFocus <= -2) return;
+        if (this.itemFocus <= -2) return; //magic number
+
         this.itemFocus--;
 
         if (this.itemFocus == -1 && this.selectAllOption.isHidden()) {
+          //magic number
           this.itemFocus--;
         }
       };
@@ -724,7 +743,9 @@
         return this.name;
       };
 
-      FilterMultiSelect.SingleOption = function () {
+      FilterMultiSelect.SingleOption =
+      /** @class */
+      function () {
         function class_3(fms, row, name, label, value, checked, disabled) {
           this.fms = fms;
           this.div = document.createElement('div');
@@ -896,9 +917,31 @@
       return FilterMultiSelect;
     }();
 
+    /*!
+     *  Multiple select dropdown with filter jQuery plugin.
+     *  Copyright (C) 2020  Andrew Wagner  github.com/andreww1011
+     *
+     *  This library is free software; you can redistribute it and/or
+     *  modify it under the terms of the GNU Lesser General Public
+     *  License as published by the Free Software Foundation; either
+     *  version 2.1 of the License, or (at your option) any later version.
+     *
+     *  This library is distributed in the hope that it will be useful,
+     *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+     *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     *  Lesser General Public License for more details.
+     *
+     *  You should have received a copy of the GNU Lesser General Public
+     *  License along with this library; if not, write to the Free Software
+     *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+     *  USA
+     */
+
     $__default['default'].fn.filterMultiSelect = function (args) {
-      var target = this;
-      args = $__default['default'].extend({}, $__default['default'].fn.filterMultiSelect.args, args);
+      var target = this; // merge the global options with the per-call options.
+
+      args = $__default['default'].extend({}, $__default['default'].fn.filterMultiSelect.args, args); // factory defaults
+
       if (typeof args.placeholderText === 'undefined') args.placeholderText = 'nothing selected';
       if (typeof args.filterText === 'undefined') args.filterText = 'Filter';
       if (typeof args.selectAllText === 'undefined') args.selectAllText = 'Select All';
@@ -952,7 +995,8 @@
         }
       };
       return methods;
-    };
+    }; // define the plugin's global default options.
+
 
     $__default['default'].fn.filterMultiSelect.args = {};
 
