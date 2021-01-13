@@ -216,11 +216,10 @@
         var cars = $('#cars').filterMultiSelect();
         var pl1 = $('#programming_languages_1').filterMultiSelect();
         $('#b1').click((e) => {
-          var x = pl1.getOption("1");
-          x.enable();
+          pl1.enableOption("1");
         });
         $('#b2').click((e) => {
-          pl1.getOption("1").disable();
+          pl1.disableOption("1");
         });
         var pl2 = $('#programming_languages_2').filterMultiSelect();
         $('#b3').click((e) => {
@@ -233,11 +232,10 @@
           allowEnablingAndDisabling: false,
         });
         $('#b5').click((e) => {
-          var x = pl3.getOption("1");
-          x.enable();
+		  pl3.enableOption("1");
         });
         $('#b6').click((e) => {
-          pl3.getOption("1").disable();
+          pl3.disableOption("1");
         });
         $('#b7').click((e) => {
           pl3.enable();
@@ -255,26 +253,26 @@
         $('#jsonbtn1').click((e) => {
           var b = true;
           var result = {
-            ...JSON.parse(animals.getSelectedOptionsJson(b)),
-            ...JSON.parse(shapes.getSelectedOptionsJson(b)),
-            ...JSON.parse(cars.getSelectedOptionsJson(b)),
-            ...JSON.parse(pl1.getSelectedOptionsJson(b)),
-            ...JSON.parse(pl2.getSelectedOptionsJson(b)),
-            ...JSON.parse(pl3.getSelectedOptionsJson(b)),
-            ...JSON.parse(cities.getSelectedOptionsJson(b)),
+            ...JSON.parse(animals.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(shapes.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(cars.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(pl1.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(pl2.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(pl3.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(cities.getSelectedOptionsAsJson(b)),
           }
           $('#jsonresult1').text(JSON.stringify(result,null,"  "));
         });
         $('#jsonbtn2').click((e) => {
           var b = false;
           var result = {
-            ...JSON.parse(animals.getSelectedOptionsJson(b)),
-            ...JSON.parse(shapes.getSelectedOptionsJson(b)),
-            ...JSON.parse(cars.getSelectedOptionsJson(b)),
-            ...JSON.parse(pl1.getSelectedOptionsJson(b)),
-            ...JSON.parse(pl2.getSelectedOptionsJson(b)),
-            ...JSON.parse(pl3.getSelectedOptionsJson(b)),
-            ...JSON.parse(cities.getSelectedOptionsJson(b)),
+            ...JSON.parse(animals.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(shapes.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(cars.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(pl1.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(pl2.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(pl3.getSelectedOptionsAsJson(b)),
+            ...JSON.parse(cities.getSelectedOptionsAsJson(b)),
           }
           $('#jsonresult2').text(JSON.stringify(result,null,"  "));
         });
@@ -290,4 +288,3 @@
   </body>
 
 </html>
-
