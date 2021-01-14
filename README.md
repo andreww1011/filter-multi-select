@@ -1,6 +1,8 @@
 # filter-multi-select
 <p>Multiple select dropdown with filter jQuery plugin.</p>
 
+<p><a href="https://jsfiddle.net/andreww1011/v29oxr8z/">JSFiddle</a></p>
+
 <p>Improve the useability of HTML <code>&ltselect&gt</code> elements:
 <ul>
   <li>options are displayed in a dropdown list.</li>
