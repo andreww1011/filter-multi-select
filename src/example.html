@@ -58,7 +58,7 @@
       <div class="form-group row">
         <label class="col-2 col-form-label" for="animals">Animals</label>
         <div class="col-10">
-          <select multiple name="animals" id="animals">
+          <select multiple name="animals" id="animals" class="filter-multi-select">
             <option value="bear">Bear</option>
             <option value="ant">Ant</option>
             <option value="salamander">Salamander</option>
@@ -206,7 +206,7 @@
       // Use the plugin once the DOM has been loaded.
       $(function () {
         // Apply the plugin 
-        var animals = $('#animals').filterMultiSelect();
+        // var animals = $('#animals').filterMultiSelect();
         var shapes = $('#shapes').filterMultiSelect({
           selectAllText: 'all...',
           placeholderText: 'click to select a shape',
@@ -251,31 +251,25 @@
                  ],
         });
         $('#jsonbtn1').click((e) => {
-          var b = true;
-          var result = {
-            ...JSON.parse(animals.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(shapes.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(cars.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(pl1.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(pl2.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(pl3.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(cities.getSelectedOptionsAsJson(b)),
-          }
-          $('#jsonresult1').text(JSON.stringify(result,null,"  "));
-        });
-        $('#jsonbtn2').click((e) => {
-          var b = false;
-          var result = {
-            ...JSON.parse(animals.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(shapes.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(cars.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(pl1.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(pl2.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(pl3.getSelectedOptionsAsJson(b)),
-            ...JSON.parse(cities.getSelectedOptionsAsJson(b)),
-          }
-          $('#jsonresult2').text(JSON.stringify(result,null,"  "));
-        });
+           var b = true;
+           $('#jsonresult1').text(JSON.stringify(getJson(b),null,"  "));
+         });
+         var getJson = function (b) {
+           var result = $.fn.filterMultiSelect.applied
+               .map((e) => JSON.parse(e.getSelectedOptionsAsJson(b)))
+               .reduce((prev,curr) => {
+                 prev = {
+                   ...prev,
+                   ...curr,
+                 };
+                 return prev;
+               });
+           return result;
+         }
+         $('#jsonbtn2').click((e) => {
+           var b = false;
+           $('#jsonresult2').text(JSON.stringify(getJson(b),null,"  "));
+         });
         $('#form').on('keypress keyup', function(e) {
           var keyCode = e.keyCode || e.which;
           if (keyCode === 13) { 
@@ -288,3 +282,4 @@
   </body>
 
 </html>
+

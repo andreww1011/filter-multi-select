@@ -35,7 +35,6 @@ import FilterMultiSelect from './FilterMultiSelect';
     if (typeof args.items === 'undefined') args.items = new Array();
 
     let filterMultiSelect = new FilterMultiSelect(target, args);
-    filterMultiSelect.initialize();
   
     const fms = $(filterMultiSelect.getRootElement());
     target.replaceWith(fms);
@@ -78,8 +77,29 @@ import FilterMultiSelect from './FilterMultiSelect';
             return filterMultiSelect.getSelectedOptionsAsJson(includeDisabled);
         }
     };
+
+    // store applied element
+    ($.fn as any).filterMultiSelect.applied.push(methods);
+
     return methods;
 };
+
+// activate plugin by targeting selector
+$(function () {
+    // factory defaults
+    let selector: string = typeof ($.fn as any).filterMultiSelect.selector === 'undefined' ? 'select.filter-multi-select' : ($.fn as any).filterMultiSelect.selector;
+    // target
+    let s: JQuery<HTMLElement> = $(selector);
+    s.each((i,e) => {
+        ($(e) as any).filterMultiSelect();
+    });
+});
+
+// store collection of applied elements
+($.fn as any).filterMultiSelect.applied = new Array();
+
+// define the plugin's global default selector.
+($.fn as any).filterMultiSelect.selector = undefined;
 
 // define the plugin's global default options.
 ($.fn as any).filterMultiSelect.args = {};

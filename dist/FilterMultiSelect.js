@@ -167,6 +167,7 @@ var FilterMultiSelect = /** @class */ (function () {
         this.showing = new Array();
         this.focusable = new Array();
         this.itemFocus = -2; //magic number
+        this.initialize();
     }
     FilterMultiSelect.createOptions = function (fms, name, htmlOptions, jsOptions) {
         var htmloptions = htmlOptions.map(function (o, i) {

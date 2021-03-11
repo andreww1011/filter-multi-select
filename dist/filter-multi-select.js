@@ -38,7 +38,6 @@ $.fn.filterMultiSelect = function (args) {
     if (typeof args.items === 'undefined')
         args.items = new Array();
     var filterMultiSelect = new FilterMultiSelect(target, args);
-    filterMultiSelect.initialize();
     var fms = $(filterMultiSelect.getRootElement());
     target.replaceWith(fms);
     var methods = {
@@ -80,8 +79,24 @@ $.fn.filterMultiSelect = function (args) {
             return filterMultiSelect.getSelectedOptionsAsJson(includeDisabled);
         }
     };
+    // store applied element
+    $.fn.filterMultiSelect.applied.push(methods);
     return methods;
 };
+// activate plugin by targeting selector
+$(function () {
+    // factory defaults
+    var selector = typeof $.fn.filterMultiSelect.selector === 'undefined' ? 'select.filter-multi-select' : $.fn.filterMultiSelect.selector;
+    // target
+    var s = $(selector);
+    s.each(function (i, e) {
+        $(e).filterMultiSelect();
+    });
+});
+// store collection of applied elements
+$.fn.filterMultiSelect.applied = new Array();
+// define the plugin's global default selector.
+$.fn.filterMultiSelect.selector = undefined;
 // define the plugin's global default options.
 $.fn.filterMultiSelect.args = {};
 //# sourceMappingURL=filter-multi-select.js.map
