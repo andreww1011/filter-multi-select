@@ -43,6 +43,8 @@
     $('#pets').filterMultiSelect();
   });
 &lt/script&gt</code></pre></li>
+    <li>Or append the class <code>filter-multi-select</code> to the select element and have it be targeted automatically.
+    <pre><code>&ltselect <b>class="filter-multi-select"</b> multiple id="pets" name="pets"&gt</code></pre></li>
   </ol>
   <p align="center">
     <img src="./screenshot.png" width="489" title="screenshot">
@@ -62,7 +64,7 @@
   </ul>
 </p>
 
-# Methods
+# API
 <p>The following methods are exposed on the plugin:
   <ul>
     <li><code>hasOption(value:string)</code> - returns true if this dropdown has an option with the specified <i>value</i> attribute, otherwise false.</li>
@@ -79,4 +81,9 @@
     <li><code>getSelectedOptionsAsJson(includeDisabled=true)</code> - returns a JSON string of the selected options' values.</li>
   </ul>
 </p>
-  
+<p>The following global fields are exposed on the jQuery extension point:
+  <ul>
+    <li><code>$.fn.filterMultiSelect.selector</code> - the selector string used to automatically target and apply the plugin. <i> default = "select.filter-multi-select"</i></li>
+    <li><code>$.fn.filterMultiSelect.applied</code> - a collection of all element groups applied by the plugin.</li>
+  </ul>
+</p>
