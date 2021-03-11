@@ -18,7 +18,6 @@
  *  USA
  */
 import $, { map } from 'jquery';
-import Option from './Option';
 
 const NULL_OPTION = new class implements Option {
     public initialize(): void {}
@@ -37,6 +36,24 @@ const NULL_OPTION = new class implements Option {
     public isHidden(): boolean {return false;}
     public focus(): void {}
 }  
+
+interface Option {
+    initialize(): void;
+    select(): void;
+    deselect(): void;
+    enable(): void;
+    disable(): void;
+    isSelected(): boolean;
+    isDisabled(): boolean;
+    getListItem(): HTMLElement;
+    getSelectedItemBadge(): HTMLElement;
+    getLabel(): string;
+    getValue(): string;
+    show(): void;
+    hide(): void;
+    isHidden(): boolean;
+    focus(): void;
+}
 
 const DEBUG = false;
 
@@ -378,9 +395,11 @@ export default class FilterMultiSelect {
         this.showing = new Array<number>();
         this.focusable = new Array<number>();
         this.itemFocus = -2; //magic number
+
+        this.initialize();
     }
 
-    public initialize(): void {
+    private initialize(): void {
         this.options.forEach(o => o.initialize());
         this.selectAllOption.initialize();
         
