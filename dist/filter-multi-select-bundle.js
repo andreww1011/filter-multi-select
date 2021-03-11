@@ -209,6 +209,8 @@
         this.showing = new Array();
         this.focusable = new Array();
         this.itemFocus = -2; //magic number
+
+        this.initialize();
       }
 
       FilterMultiSelect.createOptions = function (fms, name, htmlOptions, jsOptions) {
@@ -949,7 +951,6 @@
       if (typeof args.allowEnablingAndDisabling === 'undefined') args.allowEnablingAndDisabling = true;
       if (typeof args.items === 'undefined') args.items = new Array();
       var filterMultiSelect = new FilterMultiSelect(target, args);
-      filterMultiSelect.initialize();
       var fms = $__default['default'](filterMultiSelect.getRootElement());
       target.replaceWith(fms);
       var methods = {
@@ -993,10 +994,26 @@
 
           return filterMultiSelect.getSelectedOptionsAsJson(includeDisabled);
         }
-      };
-      return methods;
-    }; // define the plugin's global default options.
+      }; // store applied element
 
+      $__default['default'].fn.filterMultiSelect.applied.push(methods);
+      return methods;
+    }; // activate plugin by targeting selector
+
+
+    $__default['default'](function () {
+      // factory defaults
+      var selector = typeof $__default['default'].fn.filterMultiSelect.selector === 'undefined' ? 'select.filter-multi-select' : $__default['default'].fn.filterMultiSelect.selector; // target
+
+      var s = $__default['default'](selector);
+      s.each(function (i, e) {
+        $__default['default'](e).filterMultiSelect();
+      });
+    }); // store collection of applied elements
+
+    $__default['default'].fn.filterMultiSelect.applied = new Array(); // define the plugin's global default selector.
+
+    $__default['default'].fn.filterMultiSelect.selector = undefined; // define the plugin's global default options.
 
     $__default['default'].fn.filterMultiSelect.args = {};
 
