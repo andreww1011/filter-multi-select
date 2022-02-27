@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 /*!
  *  Multiple select dropdown with filter jQuery plugin.
- *  Copyright (C) 2020  Andrew Wagner  github.com/andreww1011
+ *  Copyright (C) 2022  Andrew Wagner  github.com/andreww1011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -245,6 +245,19 @@ var FilterMultiSelect = /** @class */ (function () {
             };
             return class_2;
         }(FilterMultiSelect.SingleOption))();
+    };
+    FilterMultiSelect.createEvent = function (e, n, v, l) {
+        var event = new CustomEvent(e, {
+            detail: {
+                name: n,
+                value: v,
+                label: l
+            },
+            bubbles: true,
+            cancelable: true,
+            composed: false
+        });
+        return event;
     };
     FilterMultiSelect.prototype.initialize = function () {
         this.options.forEach(function (o) { return o.initialize(); });
@@ -623,6 +636,16 @@ var FilterMultiSelect = /** @class */ (function () {
     FilterMultiSelect.prototype.getName = function () {
         return this.name;
     };
+    FilterMultiSelect.prototype.dispatchSelectedEvent = function (option) {
+        this.dispatchEvent(FilterMultiSelect.EventType.SELECTED, option.getValue(), option.getLabel());
+    };
+    FilterMultiSelect.prototype.dispatchDeselectedEvent = function (option) {
+        this.dispatchEvent(FilterMultiSelect.EventType.DESELECTED, option.getValue(), option.getLabel());
+    };
+    FilterMultiSelect.prototype.dispatchEvent = function (eventType, value, label) {
+        var event = FilterMultiSelect.createEvent(eventType, this.getName(), value, label);
+        this.viewBar.dispatchEvent(event);
+    };
     FilterMultiSelect.SingleOption = /** @class */ (function () {
         function class_3(fms, row, name, label, value, checked, disabled) {
             this.fms = fms;
@@ -721,6 +744,7 @@ var FilterMultiSelect = /** @class */ (function () {
         class_3.prototype.selectNoDisabledCheck = function () {
             this.checkbox.checked = true;
             this.fms.queueOption(this);
+            this.fms.dispatchSelectedEvent(this);
             this.fms.update();
         };
         class_3.prototype.deselect = function () {
@@ -728,6 +752,7 @@ var FilterMultiSelect = /** @class */ (function () {
                 return;
             this.checkbox.checked = false;
             this.fms.unqueueOption(this);
+            this.fms.dispatchDeselectedEvent(this);
             this.fms.update();
         };
         class_3.prototype.enable = function () {
@@ -779,6 +804,10 @@ var FilterMultiSelect = /** @class */ (function () {
         };
         return class_3;
     }());
+    FilterMultiSelect.EventType = {
+        SELECTED: "optionselected",
+        DESELECTED: "optiondeselected"
+    };
     return FilterMultiSelect;
 }());
 export default FilterMultiSelect;

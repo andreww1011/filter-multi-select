@@ -1,6 +1,6 @@
 /*! 
  *  Multiple select dropdown with filter jQuery plugin.
- *  Copyright (C) 2020  Andrew Wagner  github.com/andreww1011
+ *  Copyright (C) 2022  Andrew Wagner  github.com/andreww1011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -165,6 +165,7 @@ export default class FilterMultiSelect {
         private selectNoDisabledCheck(): void {
             this.checkbox.checked = true;
             this.fms.queueOption(this);
+            this.fms.dispatchSelectedEvent(this);
             this.fms.update();
         }
     
@@ -172,6 +173,7 @@ export default class FilterMultiSelect {
             if (this.isDisabled()) return;
             this.checkbox.checked = false;
             this.fms.unqueueOption(this);
+            this.fms.dispatchDeselectedEvent(this);
             this.fms.update();
         }
     
@@ -317,6 +319,25 @@ export default class FilterMultiSelect {
         } ();
     }
 
+    public static EventType = {
+        SELECTED: "optionselected",
+        DESELECTED: "optiondeselected",
+    } as const;
+
+    private static createEvent(e: string, n: string, v: string, l: string): CustomEvent {
+        const event = new CustomEvent(e, {
+            detail: {
+                name: n,
+                value: v,
+                label: l
+            },
+            bubbles: true,
+            cancelable: true,
+            composed: false,
+        });
+        return event;
+    }
+
     private options: Array<Option>;
     private selectAllOption;
     private div: HTMLDivElement;
@@ -337,7 +358,7 @@ export default class FilterMultiSelect {
     private itemFocus: number;
     private name: string;
 
-    constructor (selectTarget: JQuery<HTMLElement>, args: Args) {
+    constructor (selectTarget: JQuery<HTMLElement>, args: Args) {        
         let t = selectTarget.get(0);
         if (!(t instanceof HTMLSelectElement)) {
             throw new Error("JQuery target must be a select element.");
@@ -857,5 +878,24 @@ export default class FilterMultiSelect {
 
     public getName(): string {
         return this.name;
+    }
+
+    private dispatchSelectedEvent(option: Option): void {
+        this.dispatchEvent(
+            FilterMultiSelect.EventType.SELECTED,
+            option.getValue(),
+            option.getLabel());
+    }
+
+    private dispatchDeselectedEvent(option: Option): void {
+        this.dispatchEvent(
+            FilterMultiSelect.EventType.DESELECTED,
+            option.getValue(),
+            option.getLabel());
+    }
+
+    private dispatchEvent(eventType: string, value: string, label: string): void {
+        let event: CustomEvent = FilterMultiSelect.createEvent(eventType, this.getName(), value, label);
+        this.viewBar.dispatchEvent(event);
     }
 }
