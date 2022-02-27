@@ -23,7 +23,7 @@
 <p>
   <ol>
     <li>Load jQuery, Bootstrap, and the plugin bundle in your HTML code.
-    <pre><code>&ltscript src="https://code.jquery.com/jquery-3.2.1.slim.min.js"&gt&lt/script&gt
+    <pre><code>&ltscript src="https://code.jquery.com/jquery-3.2.1.min.js"&gt&lt/script&gt
 &ltlink rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/&gt
 ...
 &ltlink rel="stylesheet" href="filter_multi_select.css"/&gt
@@ -45,10 +45,18 @@
 &lt/script&gt</code></pre></li>
     <li>Or append the class <code>filter-multi-select</code> to the select element and have it be targeted automatically.
     <pre><code>&ltselect <b>class="filter-multi-select"</b> multiple id="pets" name="pets"&gt</code></pre></li>
+    <p align="center">
+      <img src="./screenshot.png" width="489" title="screenshot">
+    </p>
+    <li>Listen to the events <code>optionselected</code> and <code>optiondeselected</code> to signal changes.
+    <pre><code>&ltscript&gt
+  $(function () {
+    $('#pets').on('optionselected', function(e) {
+      ...
+    });
+  });
+&lt/script&gt</code></pre></li>
   </ol>
-  <p align="center">
-    <img src="./screenshot.png" width="489" title="screenshot">
-  </p>
 </p>
 
 # Options
@@ -85,5 +93,12 @@
   <ul>
     <li><code>$.fn.filterMultiSelect.selector</code> - the selector string used to automatically target and apply the plugin. <i> default = "select.filter-multi-select"</i></li>
     <li><code>$.fn.filterMultiSelect.applied</code> - a collection of all element groups applied by the plugin.</li>
+  </ul>
+</p>
+<p>The following data is available on the <code>optionselected</code> and <code>optiondeselected</code> event object <code>e</code>:
+  <ul>
+    <li><code>e.detail.label</code> - the display text of the option that was selected/deselected.</li>
+    <li><code>e.detail.value</code> - the value of the option that was selected/deselected.</li>
+    <li><code>e.detail.name</code> - the name of the select element from which the option was selected/deselected.</li>
   </ul>
 </p>
