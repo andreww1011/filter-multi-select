@@ -1,6 +1,6 @@
 /*!
  *  Multiple select dropdown with filter jQuery plugin.
- *  Copyright (C) 2020  Andrew Wagner  github.com/andreww1011
+ *  Copyright (C) 2022  Andrew Wagner  github.com/andreww1011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

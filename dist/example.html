@@ -1,6 +1,6 @@
 <!-- /*! 
  *  Multiple select dropdown with filter jQuery plugin.
- *  Copyright (C) 2020  Andrew Wagner  github.com/andreww1011
+ *  Copyright (C) 2022  Andrew Wagner  github.com/andreww1011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,14 @@
   <head>
     <meta charset="utf-8">
     <title>Filter Multi Select Plugin</title>
+    <style>
+      .notification {color: red; font-size: 85%;}
+    </style>
   </head>
 
   <body>
     <!-- Load jQuery -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <!-- Load Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -54,6 +57,10 @@
     <form class="container" method="GET" id="form">
       <div class="row">
         <h4 class="col-12">Default Dropdown</h4>
+      </div>
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col-10" id="notifications">&nbsp;</div>
       </div>
       <div class="form-group row">
         <label class="col-2 col-form-label" for="animals">Animals</label>
@@ -206,7 +213,22 @@
       // Use the plugin once the DOM has been loaded.
       $(function () {
         // Apply the plugin 
-        // var animals = $('#animals').filterMultiSelect();
+        var notifications = $('#notifications');
+        $('#animals').on("optionselected", function(e) {
+          createNotification("selected", e.detail.label);
+        });
+        $('#animals').on("optiondeselected", function(e) {
+          createNotification("deselected", e.detail.label);
+        });
+        function createNotification(event,label) {
+          var n = $(document.createElement('span'))
+            .text(event + ' ' + label + "  ")
+            .addClass('notification')
+            .appendTo(notifications)
+            .fadeOut(3000, function() {
+              n.remove();
+            });
+        }
         var shapes = $('#shapes').filterMultiSelect({
           selectAllText: 'all...',
           placeholderText: 'click to select a shape',
