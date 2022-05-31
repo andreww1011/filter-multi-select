@@ -30,9 +30,11 @@ import FilterMultiSelect from './FilterMultiSelect';
     if (typeof args.placeholderText === 'undefined') args.placeholderText = 'nothing selected';
     if (typeof args.filterText === 'undefined') args.filterText = 'Filter';
     if (typeof args.selectAllText === 'undefined') args.selectAllText = 'Select All';
+    if (typeof args.labelText === 'undefined') args.labelText = '';
     if (typeof args.caseSensitive === 'undefined') args.caseSensitive = false;
     if (typeof args.allowEnablingAndDisabling === 'undefined') args.allowEnablingAndDisabling = true;
     if (typeof args.items === 'undefined') args.items = new Array();
+    
 
     let filterMultiSelect = new FilterMultiSelect(target, args);
   

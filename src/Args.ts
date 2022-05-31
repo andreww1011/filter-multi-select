@@ -21,6 +21,7 @@ interface Args {
     placeholderText: string,
     filterText: string,
     selectAllText: string,
+    labelText: string,
     caseSensitive: boolean,
     allowEnablingAndDisabling: boolean,
     items: Array<[label: string, value: string, selected?: boolean, disabled?: boolean]>,
