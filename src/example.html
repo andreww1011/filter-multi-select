@@ -79,7 +79,7 @@
         <h4 class="col-12">Dropdown with pre-sets and case-sensitive filtering</h4>
       </div>
       <div class="form-group row">
-        <label class="col-2 col-form-label" for="shapes">Shapes</label>
+        <!-- <label class="col-2 col-form-label" for="shapes">Shapes</label> -->
         <div class="col-10">
           <select multiple name="shapes" id="shapes">
             <option value="1" selected>Square</option>
@@ -233,6 +233,7 @@
           selectAllText: 'all...',
           placeholderText: 'click to select a shape',
           filterText: 'search',
+          labelText: 'Shapes',
           caseSensitive: true,
         });
         var cars = $('#cars').filterMultiSelect();

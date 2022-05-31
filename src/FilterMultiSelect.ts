@@ -357,6 +357,7 @@ export default class FilterMultiSelect {
     private focusable: Array<number>;
     private itemFocus: number;
     private name: string;
+    private label: HTMLSpanElement;
 
     constructor (selectTarget: JQuery<HTMLElement>, args: Args) {        
         let t = selectTarget.get(0);
@@ -400,10 +401,18 @@ export default class FilterMultiSelect {
         this.placeholder = document.createElement('span');
         this.placeholder.textContent = args.placeholderText;
         this.selectedItems = document.createElement('span');
-        
+
+        // label
+        this.label = document.createElement('span');
+        this.label.textContent = args.labelText;
+        let customLabel:boolean = args.labelText.length != 0;
+        if (!customLabel) {
+            this.label.hidden = true;
+        }
+
         // viewbar
         this.viewBar = document.createElement('div');
-        this.viewBar.append(this.placeholder, this.selectedItems);
+        this.viewBar.append(this.label, this.placeholder, this.selectedItems);
 
         this.div = document.createElement('div');
         this.div.id = select.id;
@@ -434,6 +443,7 @@ export default class FilterMultiSelect {
         this.placeholder.className = 'placeholder';
         this.selectedItems.className = 'selected-items';
         this.viewBar.className = 'viewbar form-control dropdown-toggle';
+        this.label.className = 'col-form-label mr-2 text-dark';
 
         this.div.className = 'filter-multi-select dropdown';
 
