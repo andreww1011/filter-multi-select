@@ -154,9 +154,16 @@ var FilterMultiSelect = /** @class */ (function () {
         this.placeholder = document.createElement('span');
         this.placeholder.textContent = args.placeholderText;
         this.selectedItems = document.createElement('span');
+        // label
+        this.label = document.createElement('span');
+        this.label.textContent = args.labelText;
+        var customLabel = args.labelText.length != 0;
+        if (!customLabel) {
+            this.label.hidden = true;
+        }
         // viewbar
         this.viewBar = document.createElement('div');
-        this.viewBar.append(this.placeholder, this.selectedItems);
+        this.viewBar.append(this.label, this.placeholder, this.selectedItems);
         this.div = document.createElement('div');
         this.div.id = select.id;
         this.div.append(this.viewBar, this.dropDown);
@@ -270,6 +277,7 @@ var FilterMultiSelect = /** @class */ (function () {
         this.placeholder.className = 'placeholder';
         this.selectedItems.className = 'selected-items';
         this.viewBar.className = 'viewbar form-control dropdown-toggle';
+        this.label.className = 'col-form-label mr-2 text-dark';
         this.div.className = 'filter-multi-select dropdown';
         if (this.isDisabled()) {
             this.disableNoPermissionCheck();

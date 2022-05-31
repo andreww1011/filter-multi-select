@@ -195,10 +195,19 @@
 
         this.placeholder = document.createElement('span');
         this.placeholder.textContent = args.placeholderText;
-        this.selectedItems = document.createElement('span'); // viewbar
+        this.selectedItems = document.createElement('span'); // label
+
+        this.label = document.createElement('span');
+        this.label.textContent = args.labelText;
+        var customLabel = args.labelText.length != 0;
+
+        if (!customLabel) {
+          this.label.hidden = true;
+        } // viewbar
+
 
         this.viewBar = document.createElement('div');
-        this.viewBar.append(this.placeholder, this.selectedItems);
+        this.viewBar.append(this.label, this.placeholder, this.selectedItems);
         this.div = document.createElement('div');
         this.div.id = select.id;
         this.div.append(this.viewBar, this.dropDown);
@@ -337,6 +346,7 @@
         this.placeholder.className = 'placeholder';
         this.selectedItems.className = 'selected-items';
         this.viewBar.className = 'viewbar form-control dropdown-toggle';
+        this.label.className = 'col-form-label mr-2 text-dark';
         this.div.className = 'filter-multi-select dropdown';
 
         if (this.isDisabled()) {
@@ -980,6 +990,7 @@
       if (typeof args.placeholderText === 'undefined') args.placeholderText = 'nothing selected';
       if (typeof args.filterText === 'undefined') args.filterText = 'Filter';
       if (typeof args.selectAllText === 'undefined') args.selectAllText = 'Select All';
+      if (typeof args.labelText === 'undefined') args.labelText = '';
       if (typeof args.caseSensitive === 'undefined') args.caseSensitive = false;
       if (typeof args.allowEnablingAndDisabling === 'undefined') args.allowEnablingAndDisabling = true;
       if (typeof args.items === 'undefined') args.items = new Array();

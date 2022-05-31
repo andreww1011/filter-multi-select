@@ -31,6 +31,8 @@ $.fn.filterMultiSelect = function (args) {
         args.filterText = 'Filter';
     if (typeof args.selectAllText === 'undefined')
         args.selectAllText = 'Select All';
+    if (typeof args.labelText === 'undefined')
+        args.labelText = '';
     if (typeof args.caseSensitive === 'undefined')
         args.caseSensitive = false;
     if (typeof args.allowEnablingAndDisabling === 'undefined')
