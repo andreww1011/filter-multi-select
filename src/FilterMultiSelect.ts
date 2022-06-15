@@ -20,21 +20,23 @@
 import $, { map } from 'jquery';
 
 const NULL_OPTION = new class implements Option {
-    public initialize(): void {}
-    public select(): void {}
-    public deselect(): void {}
-    public enable(): void {}
-    public disable(): void {}
-    public isSelected(): boolean {return false;}
-    public isDisabled(): boolean {return false;}
-    public getListItem(): HTMLElement {return document.createElement('div');}
-    public getSelectedItemBadge(): HTMLElement {return document.createElement('div');}
-    public getLabel(): string {return 'NULL_OPTION'}
-    public getValue(): string {return 'NULL_OPTION'}
-    public show(): void {}
-    public hide(): void {}
-    public isHidden(): boolean {return false;}
-    public focus(): void {}
+    initialize(): void {}
+    select(): void {}
+    deselect(): void {}
+    enable(): void {}
+    disable(): void {}
+    isSelected(): boolean {return false;}
+    isDisabled(): boolean {return true;}
+    getListItem(): HTMLElement {return document.createElement('div');}
+    getSelectedItemBadge(): HTMLElement {return document.createElement('div');}
+    getLabel(): string {return 'NULL_OPTION'}
+    getValue(): string {return 'NULL_OPTION'}
+    show(): void {}
+    hide(): void {}
+    isHidden(): boolean {return true;}
+    focus(): void {}
+    activate(): void {}
+    deactivate(): void {}
 }  
 
 interface Option {
@@ -53,6 +55,15 @@ interface Option {
     hide(): void;
     isHidden(): boolean;
     focus(): void;
+    activate(): void;
+    deactivate(): void;
+}
+
+interface SelectAllOption extends Option {
+    markSelectAll(): void;
+    markSelectPartial(): void;
+    markSelectAllNotDisabled(): void;
+    markDeselect(): void;
 }
 
 const DEBUG = false;
@@ -66,6 +77,9 @@ export default class FilterMultiSelect {
         protected closeButton: HTMLButtonElement;
         protected selectedItemBadge: HTMLSpanElement;
         protected fms: FilterMultiSelect;
+        protected active: boolean;
+        protected disabled: boolean;
+        private initiallyChecked: boolean;
     
         constructor(fms: FilterMultiSelect, row: number, name:string, label: string, value: string, checked: boolean, disabled: boolean) {
             this.fms = fms;
@@ -77,7 +91,8 @@ export default class FilterMultiSelect {
             this.checkbox.id = nchbx;
             this.checkbox.name = name;
             this.checkbox.value = value;
-            this.checkbox.checked = checked;
+            this.initiallyChecked = checked;
+            this.checkbox.checked = false;
             this.checkbox.disabled = disabled;
             this.labelFor = document.createElement('label');
             this.labelFor.htmlFor = nchbx;
@@ -90,6 +105,8 @@ export default class FilterMultiSelect {
             this.selectedItemBadge.setAttribute('data-id',id);
             this.selectedItemBadge.textContent = label;
             this.selectedItemBadge.append(this.closeButton);
+            this.disabled = disabled;
+            this.active = true;
         }
     
         private log(m: string, e: Event):void {
@@ -103,12 +120,13 @@ export default class FilterMultiSelect {
             this.checkbox.className = 'custom-control-input custom-checkbox';
             this.labelFor.className = 'custom-control-label';
             this.selectedItemBadge.className = 'item';
-            if (this.isSelected()) {
+            if (this.initiallyChecked) {
                 this.selectNoDisabledCheck();
             }
-            if (this.isDisabled()) {
-                this.disableNoPermissionCheck();
+            if (this.disabled) {
+                this.setDisabledViewState();
             }
+            this.fms.update();
             this.checkbox.addEventListener('change', (e: Event) => {
                 e.stopPropagation();
                 if (this.isDisabled() || this.fms.isDisabled()) {
@@ -160,13 +178,14 @@ export default class FilterMultiSelect {
         public select(): void {
             if (this.isDisabled()) return;
             this.selectNoDisabledCheck();
+            this.fms.update();
         }
 
         private selectNoDisabledCheck(): void {
+            if (!this.fms.canSelect() || !this.isActive()) return;
             this.checkbox.checked = true;
             this.fms.queueOption(this);
             this.fms.dispatchSelectedEvent(this);
-            this.fms.update();
         }
     
         public deselect(): void {
@@ -178,21 +197,25 @@ export default class FilterMultiSelect {
         }
     
         public enable(): void {
-            if (!this.fms.isEnablingAndDisablingPermitted()) return;
+            this.disabled = false;
+            this.setEnabledViewState();
+            this.fms.update();
+        }
+
+        private setEnabledViewState(): void {
             this.checkbox.disabled = false;
             this.selectedItemBadge.classList.remove('disabled');
-            this.fms.update();
         }
     
         public disable(): void {
-            if (!this.fms.isEnablingAndDisablingPermitted()) return;
-            this.disableNoPermissionCheck();
+            this.disabled = true;
+            this.setDisabledViewState();
+            this.fms.update();
         }
 
-        private disableNoPermissionCheck(): void {
+        private setDisabledViewState(): void {
             this.checkbox.disabled = true;
             this.selectedItemBadge.classList.add('disabled');
-            this.fms.update();
         }
     
         public isSelected(): boolean {
@@ -234,6 +257,22 @@ export default class FilterMultiSelect {
         public focus(): void {
             this.labelFor.focus();
         }
+
+        isActive(): boolean {
+            return this.active;
+        }
+
+        public activate(): void {
+            this.active = true;
+            if (!this.disabled) {
+                this.setEnabledViewState();
+            }
+        }
+
+        public deactivate(): void {
+            this.active = false;
+            this.setDisabledViewState();
+        }
     }
 
     private static createOptions(fms: FilterMultiSelect, name: string, htmlOptions: Array<HTMLOptionElement>, jsOptions: Array<[label:string, value:string, selected?:boolean, disabled?:boolean]>): Array<Option> {
@@ -270,53 +309,85 @@ export default class FilterMultiSelect {
         }
     }
 
-    private static createSelectAllOption(fms: FilterMultiSelect, name: string, label: string) {
-        return new class extends FilterMultiSelect.SingleOption {
-            constructor() {
-                super(fms,-1,name,label,'',false,false); //magic number
-                this.checkbox.indeterminate = false;
-            }
+    private static UnrestrictedSelectAllOption = class extends FilterMultiSelect.SingleOption implements SelectAllOption {
+        constructor(fms: FilterMultiSelect, name: string, label: string) {
+            super(fms,-1,name,label,'',false,false); //magic number
+            this.checkbox.indeterminate = false;
+        }
 
-            markSelectAll(): void {
-                this.checkbox.checked = true;
-                this.checkbox.indeterminate = false;
-            }
+        public markSelectAll(): void {
+            this.checkbox.checked = true;
+            this.checkbox.indeterminate = false;
+        }
 
-            markSelectPartial(): void {
-                this.checkbox.checked = false;
-                this.checkbox.indeterminate = true;
-            }
+        public markSelectPartial(): void {
+            this.checkbox.checked = false;
+            this.checkbox.indeterminate = true;
+        }
 
-            markSelectAllNotDisabled(): void {
-                this.checkbox.checked = true;
-                this.checkbox.indeterminate = true;
-            }
+        public markSelectAllNotDisabled(): void {
+            this.checkbox.checked = true;
+            this.checkbox.indeterminate = true;
+        }
 
-            markDeselect(): void {
-                this.checkbox.checked = false;
-                this.checkbox.indeterminate = false;
-            }
+        public markDeselect(): void {
+            this.checkbox.checked = false;
+            this.checkbox.indeterminate = false;
+        }
 
-            public select(): void {
-                if (this.isDisabled()) return;
-                this.fms.options.filter((o) => !o.isSelected())
-                    .forEach((o) => o.select());
-            }
+        public select(): void {
+            if (this.isDisabled()) return;
+            this.fms.options.filter((o) => !o.isSelected())
+                .forEach((o) => o.select());
+            this.fms.update();
+        }
+    
+        public deselect(): void {
+            if (this.isDisabled()) return;
+            this.fms.options.filter((o) => o.isSelected())
+                .forEach((o) => o.deselect());
+            this.fms.update();
+        }
+
+        public enable(): void {
+            this.disabled = false;
+            this.checkbox.disabled = false;
+        }
+    
+        public disable(): void {
+            this.disabled = true;
+            this.checkbox.disabled = true;
+        }
+    }
+
+    private static RestrictedSelectAllOption = class implements SelectAllOption {
+        private usao: SelectAllOption;
         
-            public deselect(): void {
-                if (this.isDisabled()) return;
-                this.fms.options.filter((o) => o.isSelected())
-                    .forEach((o) => o.deselect());
-            }
-
-            public enable(): void {
-                this.checkbox.disabled = false;
-            }
+        constructor(fms: FilterMultiSelect, name: string, label: string) {
+            this.usao = new FilterMultiSelect.UnrestrictedSelectAllOption(fms,name,label);
+        }
         
-            public disable(): void {
-                this.checkbox.disabled = true;
-            }
-        } ();
+        initialize(): void {this.usao.initialize();}
+        select(): void {}
+        deselect(): void {this.usao.deselect();}
+        enable(): void {}
+        disable(): void {}
+        isSelected(): boolean {return false;}
+        isDisabled(): boolean {return true;}
+        getListItem(): HTMLElement {return document.createElement('div');}
+        getSelectedItemBadge(): HTMLElement {return document.createElement('div');}
+        getLabel(): string {return 'RESTRICTED_SELECT_ALL_OPTION'}
+        getValue(): string {return 'RESTRICTED_SELECT_ALL_OPTION'}
+        show(): void {}
+        hide(): void {}
+        isHidden(): boolean {return true;}
+        focus(): void {}
+        markSelectAll(): void {}
+        markSelectPartial(): void {}
+        markSelectAllNotDisabled(): void {}
+        markDeselect(): void {}
+        activate(): void {}
+        deactivate(): void {}
     }
 
     public static EventType = {
@@ -339,7 +410,7 @@ export default class FilterMultiSelect {
     }
 
     private options: Array<Option>;
-    private selectAllOption;
+    private selectAllOption: SelectAllOption;
     private div: HTMLDivElement;
     private viewBar: HTMLDivElement;
     private placeholder: HTMLSpanElement;
@@ -354,10 +425,12 @@ export default class FilterMultiSelect {
     private allowEnablingAndDisabling: boolean;
     private filterText: string;
     private showing: Array<number>;
-    private focusable: Array<number>;
     private itemFocus: number;
     private name: string;
     private label: HTMLSpanElement;
+    private maxNumSelectedItems: number;
+    private numSelectedItems: number;
+    private selectionCounter: HTMLSpanElement;
 
     constructor (selectTarget: JQuery<HTMLElement>, args: Args) {        
         let t = selectTarget.get(0);
@@ -365,10 +438,6 @@ export default class FilterMultiSelect {
             throw new Error("JQuery target must be a select element.");
         }
         let select: HTMLSelectElement = t;
-        let multiple: boolean = select.multiple;
-        if (!multiple) {
-            throw new Error("Select element must have the \"multiple\" attribute.")
-        }
         let name: string = select.name;
         if (!name) {
             throw new Error("Select element must have a name attribute.");
@@ -376,7 +445,19 @@ export default class FilterMultiSelect {
         this.name = name;
         let array: Array<HTMLOptionElement> = selectTarget.find('option').toArray();
         this.options = FilterMultiSelect.createOptions(this, name, array, args.items);
-        this.selectAllOption = FilterMultiSelect.createSelectAllOption(this, name, args.selectAllText);
+
+        // restrict selection
+        this.numSelectedItems = 0;
+        this.maxNumSelectedItems =  !select.multiple ? 1 : 
+                                    args.selectionLimit > 0 ? args.selectionLimit :
+                                    parseInt(select.getAttribute('multiple')) > 0 ? parseInt(select.getAttribute('multiple')) :
+                                    0; //magic number 
+        const numOptions: number = this.options.length;
+        const restrictSelection: boolean = this.maxNumSelectedItems > 0 && this.maxNumSelectedItems < numOptions;
+        this.maxNumSelectedItems = restrictSelection ? this.maxNumSelectedItems : numOptions + 1;
+        this.selectAllOption = restrictSelection ? 
+                new FilterMultiSelect.RestrictedSelectAllOption(this, name, args.selectAllText) : 
+                new FilterMultiSelect.UnrestrictedSelectAllOption(this, name, args.selectAllText);
 
         // filter box
         this.filterInput = document.createElement('input');
@@ -387,7 +468,7 @@ export default class FilterMultiSelect {
         this.clearButton.innerHTML = '&times;';
         this.filter = document.createElement('div');
         this.filter.append(this.filterInput, this.clearButton);
-        
+
         // items
         this.items = document.createElement('div');
         this.items.append(this.selectAllOption.getListItem());
@@ -405,14 +486,18 @@ export default class FilterMultiSelect {
         // label
         this.label = document.createElement('span');
         this.label.textContent = args.labelText;
-        let customLabel:boolean = args.labelText.length != 0;
+        let customLabel: boolean = args.labelText.length != 0;
         if (!customLabel) {
             this.label.hidden = true;
         }
 
+        // selection counter
+        this.selectionCounter = document.createElement('span');
+        this.selectionCounter.hidden = !restrictSelection;
+
         // viewbar
         this.viewBar = document.createElement('div');
-        this.viewBar.append(this.label, this.placeholder, this.selectedItems);
+        this.viewBar.append(this.label, this.selectionCounter, this.placeholder, this.selectedItems);
 
         this.div = document.createElement('div');
         this.div.id = select.id;
@@ -423,7 +508,6 @@ export default class FilterMultiSelect {
         this.allowEnablingAndDisabling = args.allowEnablingAndDisabling;
         this.filterText = '';
         this.showing = new Array<number>();
-        this.focusable = new Array<number>();
         this.itemFocus = -2; //magic number
 
         this.initialize();
@@ -432,6 +516,7 @@ export default class FilterMultiSelect {
     private initialize(): void {
         this.options.forEach(o => o.initialize());
         this.selectAllOption.initialize();
+        
         
         this.filterInput.className = 'form-control';
         this.clearButton.tabIndex = -1;
@@ -444,6 +529,7 @@ export default class FilterMultiSelect {
         this.selectedItems.className = 'selected-items';
         this.viewBar.className = 'viewbar form-control dropdown-toggle';
         this.label.className = 'col-form-label mr-2 text-dark';
+        this.selectionCounter.className = 'mr-2';
 
         this.div.className = 'filter-multi-select dropdown';
 
@@ -453,6 +539,7 @@ export default class FilterMultiSelect {
 
         this.attachDropdownListeners();
         this.attachViewbarListeners();
+        
         this.closeDropdown();
     }
 
@@ -517,15 +604,11 @@ export default class FilterMultiSelect {
             this.selectAllOption.show();
         }
         let showing = new Array<number>();
-        let focusable = new Array<number>();
         if (this.caseSensitive) {
             this.options.forEach((o: Option, i: number) => {
                 if (o.getLabel().indexOf(text) !== -1) { //magic number
                     o.show();
                     showing.push(i);
-                    if (!o.isDisabled()) {
-                        focusable.push(i);
-                    }
                 } else {
                     o.hide();
                 }
@@ -535,9 +618,6 @@ export default class FilterMultiSelect {
                 if (o.getLabel().toLowerCase().indexOf(text.toLowerCase()) !== -1 ) { //magic number 
                     o.show();
                     showing.push(i);
-                    if (!o.isDisabled()) {
-                        focusable.push(i);
-                    }
                 } else {
                     o.hide();
                 }
@@ -545,7 +625,6 @@ export default class FilterMultiSelect {
         }
         this.filterText = text;
         this.showing = showing;
-        this.focusable = focusable;
     }
 
     private clearFilterAndRefocus(): void {
@@ -649,18 +728,30 @@ export default class FilterMultiSelect {
     };
 
     private incrementItemFocus(): void {
-        if (this.itemFocus >= this.focusable.length - 1 || this.focusable.length == 0) return;
-        this.itemFocus++;
-        if (this.itemFocus == -1 && this.selectAllOption.isHidden()) { //magic number
-            this.itemFocus++;
+        if (this.itemFocus >= this.options.length - 1) return; 
+        let i = this.itemFocus;
+        do {
+            i++;
+        } while ((i == -1 && (this.selectAllOption.isDisabled() || this.selectAllOption.isHidden())) || //magic number
+            (i >= 0 && i < this.options.length && (this.options[i].isDisabled() || this.options[i].isHidden())));
+        this.itemFocus = i > this.options.length - 1 ? this.itemFocus : i;
+        if (DEBUG) {
+            console.log("item focus: "+ this.itemFocus);
         }
     }
 
     private decrementItemFocus(): void {
         if (this.itemFocus <= -2) return; //magic number
-        this.itemFocus--;
-        if (this.itemFocus == -1 && this.selectAllOption.isHidden()) { //magic number
-            this.itemFocus--;
+        let i = this.itemFocus;
+        do {
+            i--;
+            
+        } while ((i == -1 && (this.selectAllOption.isDisabled() || this.selectAllOption.isHidden())) ||
+            (i >= 0 && (this.options[i].isDisabled() || this.options[i].isHidden())) &&
+            i > -2); //magic number
+        this.itemFocus = i; 
+        if (DEBUG) {
+            console.log("item focus: "+ this.itemFocus);
         }
     }
 
@@ -670,7 +761,7 @@ export default class FilterMultiSelect {
         } else if (this.itemFocus === -1) {
             this.selectAllOption.focus();
         } else {
-            this.options[this.focusable[this.itemFocus]].focus();
+            this.options[this.itemFocus].focus();
         }
     }
 
@@ -716,11 +807,13 @@ export default class FilterMultiSelect {
 
     private queueOption(option: Option): void {
         if (this.options.indexOf(option) == -1) return;
+        this.numSelectedItems++;
         $(this.selectedItems).append(option.getSelectedItemBadge());
     }
 
     private unqueueOption(option: Option): void {
         if (this.options.indexOf(option) == -1) return;
+        this.numSelectedItems--;
         $(this.selectedItems).children('[data-id="' + option.getSelectedItemBadge().getAttribute('data-id') + '"]').remove();
     }
 
@@ -745,6 +838,16 @@ export default class FilterMultiSelect {
         } else {
             this.selectAllOption.enable();
         }
+        if (!this.canSelect()) {
+            this.options
+                .filter((o) => !o.isSelected())
+                .forEach((o) => o.deactivate());
+        } else {
+            this.options
+                .filter((o) => !o.isSelected())
+                .forEach((o) => o.activate());
+        }
+        this.updateSelectionCounter();
     }
 
     private areAllSelected(): boolean {
@@ -794,10 +897,12 @@ export default class FilterMultiSelect {
     }
 
     public selectOption(value: string): void {
+        if (this.isDisabled()) return;
         this.getOption(value).select();
     }
 
     public deselectOption(value: string): void {
+        if (this.isDisabled()) return;
         this.getOption(value).deselect();
     }
 
@@ -806,10 +911,12 @@ export default class FilterMultiSelect {
     }
 
     public enableOption(value: string): void {
+        if (!this.isEnablingAndDisablingPermitted()) return;
         this.getOption(value).enable();
     }
 
     public disableOption(value: string): void {
+        if (!this.isEnablingAndDisablingPermitted()) return;
         this.getOption(value).disable();
     }
 
@@ -856,10 +963,12 @@ export default class FilterMultiSelect {
     }
 
     public selectAll(): void {
+        if (this.isDisabled()) return;
         this.selectAllOption.select();
     }
 
     public deselectAll(): void {
+        if (this.isDisabled()) return;
         this.selectAllOption.deselect();
     }
 
@@ -907,5 +1016,13 @@ export default class FilterMultiSelect {
     private dispatchEvent(eventType: string, value: string, label: string): void {
         let event: CustomEvent = FilterMultiSelect.createEvent(eventType, this.getName(), value, label);
         this.viewBar.dispatchEvent(event);
+    }
+
+    private canSelect(): boolean {
+        return this.numSelectedItems < this.maxNumSelectedItems;
+    }
+
+    private updateSelectionCounter(): void {
+        this.selectionCounter.textContent = this.numSelectedItems + "/" + this.maxNumSelectedItems;
     }
 }
