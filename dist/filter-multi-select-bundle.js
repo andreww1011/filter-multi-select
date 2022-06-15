@@ -48,7 +48,7 @@
       };
 
       class_1.prototype.isDisabled = function () {
-        return false;
+        return true;
       };
 
       class_1.prototype.getListItem = function () {
@@ -72,10 +72,14 @@
       class_1.prototype.hide = function () {};
 
       class_1.prototype.isHidden = function () {
-        return false;
+        return true;
       };
 
       class_1.prototype.focus = function () {};
+
+      class_1.prototype.activate = function () {};
+
+      class_1.prototype.deactivate = function () {};
 
       return class_1;
     }())();
@@ -158,12 +162,6 @@
         }
 
         var select = t;
-        var multiple = select.multiple;
-
-        if (!multiple) {
-          throw new Error("Select element must have the \"multiple\" attribute.");
-        }
-
         var name = select.name;
 
         if (!name) {
@@ -172,8 +170,15 @@
 
         this.name = name;
         var array = selectTarget.find('option').toArray();
-        this.options = FilterMultiSelect.createOptions(this, name, array, args.items);
-        this.selectAllOption = FilterMultiSelect.createSelectAllOption(this, name, args.selectAllText); // filter box
+        this.options = FilterMultiSelect.createOptions(this, name, array, args.items); // restrict selection
+
+        this.numSelectedItems = 0;
+        this.maxNumSelectedItems = !select.multiple ? 1 : args.selectionLimit > 0 ? args.selectionLimit : parseInt(select.getAttribute('multiple')) > 0 ? parseInt(select.getAttribute('multiple')) : 0; //magic number 
+
+        var numOptions = this.options.length;
+        var restrictSelection = this.maxNumSelectedItems > 0 && this.maxNumSelectedItems < numOptions;
+        this.maxNumSelectedItems = restrictSelection ? this.maxNumSelectedItems : numOptions + 1;
+        this.selectAllOption = restrictSelection ? new FilterMultiSelect.RestrictedSelectAllOption(this, name, args.selectAllText) : new FilterMultiSelect.UnrestrictedSelectAllOption(this, name, args.selectAllText); // filter box
 
         this.filterInput = document.createElement('input');
         this.filterInput.type = 'text';
@@ -203,11 +208,14 @@
 
         if (!customLabel) {
           this.label.hidden = true;
-        } // viewbar
+        } // selection counter
 
+
+        this.selectionCounter = document.createElement('span');
+        this.selectionCounter.hidden = !restrictSelection; // viewbar
 
         this.viewBar = document.createElement('div');
-        this.viewBar.append(this.label, this.placeholder, this.selectedItems);
+        this.viewBar.append(this.label, this.selectionCounter, this.placeholder, this.selectedItems);
         this.div = document.createElement('div');
         this.div.id = select.id;
         this.div.append(this.viewBar, this.dropDown);
@@ -216,7 +224,6 @@
         this.allowEnablingAndDisabling = args.allowEnablingAndDisabling;
         this.filterText = '';
         this.showing = new Array();
-        this.focusable = new Array();
         this.itemFocus = -2; //magic number
 
         this.initialize();
@@ -256,69 +263,6 @@
         }
       };
 
-      FilterMultiSelect.createSelectAllOption = function (fms, name, label) {
-        return new (
-        /** @class */
-        function (_super) {
-          __extends(class_2, _super);
-
-          function class_2() {
-            var _this = _super.call(this, fms, -1, name, label, '', false, false) || this;
-
-            _this.checkbox.indeterminate = false;
-            return _this;
-          }
-
-          class_2.prototype.markSelectAll = function () {
-            this.checkbox.checked = true;
-            this.checkbox.indeterminate = false;
-          };
-
-          class_2.prototype.markSelectPartial = function () {
-            this.checkbox.checked = false;
-            this.checkbox.indeterminate = true;
-          };
-
-          class_2.prototype.markSelectAllNotDisabled = function () {
-            this.checkbox.checked = true;
-            this.checkbox.indeterminate = true;
-          };
-
-          class_2.prototype.markDeselect = function () {
-            this.checkbox.checked = false;
-            this.checkbox.indeterminate = false;
-          };
-
-          class_2.prototype.select = function () {
-            if (this.isDisabled()) return;
-            this.fms.options.filter(function (o) {
-              return !o.isSelected();
-            }).forEach(function (o) {
-              return o.select();
-            });
-          };
-
-          class_2.prototype.deselect = function () {
-            if (this.isDisabled()) return;
-            this.fms.options.filter(function (o) {
-              return o.isSelected();
-            }).forEach(function (o) {
-              return o.deselect();
-            });
-          };
-
-          class_2.prototype.enable = function () {
-            this.checkbox.disabled = false;
-          };
-
-          class_2.prototype.disable = function () {
-            this.checkbox.disabled = true;
-          };
-
-          return class_2;
-        }(FilterMultiSelect.SingleOption))();
-      };
-
       FilterMultiSelect.createEvent = function (e, n, v, l) {
         var event = new CustomEvent(e, {
           detail: {
@@ -347,6 +291,7 @@
         this.selectedItems.className = 'selected-items';
         this.viewBar.className = 'viewbar form-control dropdown-toggle';
         this.label.className = 'col-form-label mr-2 text-dark';
+        this.selectionCounter.className = 'mr-2';
         this.div.className = 'filter-multi-select dropdown';
 
         if (this.isDisabled()) {
@@ -423,7 +368,6 @@
         }
 
         var showing = new Array();
-        var focusable = new Array();
 
         if (this.caseSensitive) {
           this.options.forEach(function (o, i) {
@@ -431,10 +375,6 @@
               //magic number
               o.show();
               showing.push(i);
-
-              if (!o.isDisabled()) {
-                focusable.push(i);
-              }
             } else {
               o.hide();
             }
@@ -445,10 +385,6 @@
               //magic number 
               o.show();
               showing.push(i);
-
-              if (!o.isDisabled()) {
-                focusable.push(i);
-              }
             } else {
               o.hide();
             }
@@ -457,7 +393,6 @@
 
         this.filterText = text;
         this.showing = showing;
-        this.focusable = focusable;
       };
 
       FilterMultiSelect.prototype.clearFilterAndRefocus = function () {
@@ -517,24 +452,28 @@
       };
 
       FilterMultiSelect.prototype.incrementItemFocus = function () {
-        if (this.itemFocus >= this.focusable.length - 1 || this.focusable.length == 0) return;
-        this.itemFocus++;
+        if (this.itemFocus >= this.options.length - 1) return;
+        var i = this.itemFocus;
 
-        if (this.itemFocus == -1 && this.selectAllOption.isHidden()) {
-          //magic number
-          this.itemFocus++;
-        }
+        do {
+          i++;
+        } while (i == -1 && (this.selectAllOption.isDisabled() || this.selectAllOption.isHidden()) || //magic number
+        i >= 0 && i < this.options.length && (this.options[i].isDisabled() || this.options[i].isHidden()));
+
+        this.itemFocus = i > this.options.length - 1 ? this.itemFocus : i;
       };
 
       FilterMultiSelect.prototype.decrementItemFocus = function () {
         if (this.itemFocus <= -2) return; //magic number
 
-        this.itemFocus--;
+        var i = this.itemFocus;
 
-        if (this.itemFocus == -1 && this.selectAllOption.isHidden()) {
-          //magic number
-          this.itemFocus--;
-        }
+        do {
+          i--;
+        } while (i == -1 && (this.selectAllOption.isDisabled() || this.selectAllOption.isHidden()) || i >= 0 && (this.options[i].isDisabled() || this.options[i].isHidden()) && i > -2); //magic number
+
+
+        this.itemFocus = i;
       };
 
       FilterMultiSelect.prototype.focusItem = function () {
@@ -543,7 +482,7 @@
         } else if (this.itemFocus === -1) {
           this.selectAllOption.focus();
         } else {
-          this.options[this.focusable[this.itemFocus]].focus();
+          this.options[this.itemFocus].focus();
         }
       };
 
@@ -561,11 +500,13 @@
 
       FilterMultiSelect.prototype.queueOption = function (option) {
         if (this.options.indexOf(option) == -1) return;
+        this.numSelectedItems++;
         $__default['default'](this.selectedItems).append(option.getSelectedItemBadge());
       };
 
       FilterMultiSelect.prototype.unqueueOption = function (option) {
         if (this.options.indexOf(option) == -1) return;
+        this.numSelectedItems--;
         $__default['default'](this.selectedItems).children('[data-id="' + option.getSelectedItemBadge().getAttribute('data-id') + '"]').remove();
       };
 
@@ -591,6 +532,22 @@
         } else {
           this.selectAllOption.enable();
         }
+
+        if (!this.canSelect()) {
+          this.options.filter(function (o) {
+            return !o.isSelected();
+          }).forEach(function (o) {
+            return o.deactivate();
+          });
+        } else {
+          this.options.filter(function (o) {
+            return !o.isSelected();
+          }).forEach(function (o) {
+            return o.activate();
+          });
+        }
+
+        this.updateSelectionCounter();
       };
 
       FilterMultiSelect.prototype.areAllSelected = function () {
@@ -652,10 +609,12 @@
       };
 
       FilterMultiSelect.prototype.selectOption = function (value) {
+        if (this.isDisabled()) return;
         this.getOption(value).select();
       };
 
       FilterMultiSelect.prototype.deselectOption = function (value) {
+        if (this.isDisabled()) return;
         this.getOption(value).deselect();
       };
 
@@ -664,10 +623,12 @@
       };
 
       FilterMultiSelect.prototype.enableOption = function (value) {
+        if (!this.isEnablingAndDisablingPermitted()) return;
         this.getOption(value).enable();
       };
 
       FilterMultiSelect.prototype.disableOption = function (value) {
+        if (!this.isEnablingAndDisablingPermitted()) return;
         this.getOption(value).disable();
       };
 
@@ -720,10 +681,12 @@
       };
 
       FilterMultiSelect.prototype.selectAll = function () {
+        if (this.isDisabled()) return;
         this.selectAllOption.select();
       };
 
       FilterMultiSelect.prototype.deselectAll = function () {
+        if (this.isDisabled()) return;
         this.selectAllOption.deselect();
       };
 
@@ -782,10 +745,18 @@
         this.viewBar.dispatchEvent(event);
       };
 
+      FilterMultiSelect.prototype.canSelect = function () {
+        return this.numSelectedItems < this.maxNumSelectedItems;
+      };
+
+      FilterMultiSelect.prototype.updateSelectionCounter = function () {
+        this.selectionCounter.textContent = this.numSelectedItems + "/" + this.maxNumSelectedItems;
+      };
+
       FilterMultiSelect.SingleOption =
       /** @class */
       function () {
-        function class_3(fms, row, name, label, value, checked, disabled) {
+        function class_2(fms, row, name, label, value, checked, disabled) {
           this.fms = fms;
           this.div = document.createElement('div');
           this.checkbox = document.createElement('input');
@@ -795,7 +766,8 @@
           this.checkbox.id = nchbx;
           this.checkbox.name = name;
           this.checkbox.value = value;
-          this.checkbox.checked = checked;
+          this.initiallyChecked = checked;
+          this.checkbox.checked = false;
           this.checkbox.disabled = disabled;
           this.labelFor = document.createElement('label');
           this.labelFor.htmlFor = nchbx;
@@ -808,12 +780,14 @@
           this.selectedItemBadge.setAttribute('data-id', id);
           this.selectedItemBadge.textContent = label;
           this.selectedItemBadge.append(this.closeButton);
+          this.disabled = disabled;
+          this.active = true;
         }
 
-        class_3.prototype.log = function (m, e) {
+        class_2.prototype.log = function (m, e) {
         };
 
-        class_3.prototype.initialize = function () {
+        class_2.prototype.initialize = function () {
           var _this = this;
 
           this.div.className = 'dropdown-item custom-control';
@@ -821,14 +795,15 @@
           this.labelFor.className = 'custom-control-label';
           this.selectedItemBadge.className = 'item';
 
-          if (this.isSelected()) {
+          if (this.initiallyChecked) {
             this.selectNoDisabledCheck();
           }
 
-          if (this.isDisabled()) {
-            this.disableNoPermissionCheck();
+          if (this.disabled) {
+            this.setDisabledViewState();
           }
 
+          this.fms.update();
           this.checkbox.addEventListener('change', function (e) {
             e.stopPropagation();
 
@@ -874,19 +849,20 @@
           this.closeButton.tabIndex = -1;
         };
 
-        class_3.prototype.select = function () {
+        class_2.prototype.select = function () {
           if (this.isDisabled()) return;
           this.selectNoDisabledCheck();
-        };
-
-        class_3.prototype.selectNoDisabledCheck = function () {
-          this.checkbox.checked = true;
-          this.fms.queueOption(this);
-          this.fms.dispatchSelectedEvent(this);
           this.fms.update();
         };
 
-        class_3.prototype.deselect = function () {
+        class_2.prototype.selectNoDisabledCheck = function () {
+          if (!this.fms.canSelect() || !this.isActive()) return;
+          this.checkbox.checked = true;
+          this.fms.queueOption(this);
+          this.fms.dispatchSelectedEvent(this);
+        };
+
+        class_2.prototype.deselect = function () {
           if (this.isDisabled()) return;
           this.checkbox.checked = false;
           this.fms.unqueueOption(this);
@@ -894,65 +870,221 @@
           this.fms.update();
         };
 
-        class_3.prototype.enable = function () {
-          if (!this.fms.isEnablingAndDisablingPermitted()) return;
+        class_2.prototype.enable = function () {
+          this.disabled = false;
+          this.setEnabledViewState();
+          this.fms.update();
+        };
+
+        class_2.prototype.setEnabledViewState = function () {
           this.checkbox.disabled = false;
           this.selectedItemBadge.classList.remove('disabled');
+        };
+
+        class_2.prototype.disable = function () {
+          this.disabled = true;
+          this.setDisabledViewState();
           this.fms.update();
         };
 
-        class_3.prototype.disable = function () {
-          if (!this.fms.isEnablingAndDisablingPermitted()) return;
-          this.disableNoPermissionCheck();
-        };
-
-        class_3.prototype.disableNoPermissionCheck = function () {
+        class_2.prototype.setDisabledViewState = function () {
           this.checkbox.disabled = true;
           this.selectedItemBadge.classList.add('disabled');
-          this.fms.update();
         };
 
-        class_3.prototype.isSelected = function () {
+        class_2.prototype.isSelected = function () {
           return this.checkbox.checked;
         };
 
-        class_3.prototype.isDisabled = function () {
+        class_2.prototype.isDisabled = function () {
           return this.checkbox.disabled;
         };
 
-        class_3.prototype.getListItem = function () {
+        class_2.prototype.getListItem = function () {
           return this.div;
         };
 
-        class_3.prototype.getSelectedItemBadge = function () {
+        class_2.prototype.getSelectedItemBadge = function () {
           return this.selectedItemBadge;
         };
 
-        class_3.prototype.getLabel = function () {
+        class_2.prototype.getLabel = function () {
           return this.labelFor.textContent;
         };
 
-        class_3.prototype.getValue = function () {
+        class_2.prototype.getValue = function () {
           return this.checkbox.value;
         };
 
-        class_3.prototype.show = function () {
+        class_2.prototype.show = function () {
           this.div.hidden = false;
         };
 
-        class_3.prototype.hide = function () {
+        class_2.prototype.hide = function () {
           this.div.hidden = true;
         };
 
-        class_3.prototype.isHidden = function () {
+        class_2.prototype.isHidden = function () {
           return this.div.hidden;
         };
 
-        class_3.prototype.focus = function () {
+        class_2.prototype.focus = function () {
           this.labelFor.focus();
         };
 
+        class_2.prototype.isActive = function () {
+          return this.active;
+        };
+
+        class_2.prototype.activate = function () {
+          this.active = true;
+
+          if (!this.disabled) {
+            this.setEnabledViewState();
+          }
+        };
+
+        class_2.prototype.deactivate = function () {
+          this.active = false;
+          this.setDisabledViewState();
+        };
+
+        return class_2;
+      }();
+
+      FilterMultiSelect.UnrestrictedSelectAllOption =
+      /** @class */
+      function (_super) {
+        __extends(class_3, _super);
+
+        function class_3(fms, name, label) {
+          var _this = _super.call(this, fms, -1, name, label, '', false, false) || this;
+
+          _this.checkbox.indeterminate = false;
+          return _this;
+        }
+
+        class_3.prototype.markSelectAll = function () {
+          this.checkbox.checked = true;
+          this.checkbox.indeterminate = false;
+        };
+
+        class_3.prototype.markSelectPartial = function () {
+          this.checkbox.checked = false;
+          this.checkbox.indeterminate = true;
+        };
+
+        class_3.prototype.markSelectAllNotDisabled = function () {
+          this.checkbox.checked = true;
+          this.checkbox.indeterminate = true;
+        };
+
+        class_3.prototype.markDeselect = function () {
+          this.checkbox.checked = false;
+          this.checkbox.indeterminate = false;
+        };
+
+        class_3.prototype.select = function () {
+          if (this.isDisabled()) return;
+          this.fms.options.filter(function (o) {
+            return !o.isSelected();
+          }).forEach(function (o) {
+            return o.select();
+          });
+          this.fms.update();
+        };
+
+        class_3.prototype.deselect = function () {
+          if (this.isDisabled()) return;
+          this.fms.options.filter(function (o) {
+            return o.isSelected();
+          }).forEach(function (o) {
+            return o.deselect();
+          });
+          this.fms.update();
+        };
+
+        class_3.prototype.enable = function () {
+          this.disabled = false;
+          this.checkbox.disabled = false;
+        };
+
+        class_3.prototype.disable = function () {
+          this.disabled = true;
+          this.checkbox.disabled = true;
+        };
+
         return class_3;
+      }(FilterMultiSelect.SingleOption);
+
+      FilterMultiSelect.RestrictedSelectAllOption =
+      /** @class */
+      function () {
+        function class_4(fms, name, label) {
+          this.usao = new FilterMultiSelect.UnrestrictedSelectAllOption(fms, name, label);
+        }
+
+        class_4.prototype.initialize = function () {
+          this.usao.initialize();
+        };
+
+        class_4.prototype.select = function () {};
+
+        class_4.prototype.deselect = function () {
+          this.usao.deselect();
+        };
+
+        class_4.prototype.enable = function () {};
+
+        class_4.prototype.disable = function () {};
+
+        class_4.prototype.isSelected = function () {
+          return false;
+        };
+
+        class_4.prototype.isDisabled = function () {
+          return true;
+        };
+
+        class_4.prototype.getListItem = function () {
+          return document.createElement('div');
+        };
+
+        class_4.prototype.getSelectedItemBadge = function () {
+          return document.createElement('div');
+        };
+
+        class_4.prototype.getLabel = function () {
+          return 'RESTRICTED_SELECT_ALL_OPTION';
+        };
+
+        class_4.prototype.getValue = function () {
+          return 'RESTRICTED_SELECT_ALL_OPTION';
+        };
+
+        class_4.prototype.show = function () {};
+
+        class_4.prototype.hide = function () {};
+
+        class_4.prototype.isHidden = function () {
+          return true;
+        };
+
+        class_4.prototype.focus = function () {};
+
+        class_4.prototype.markSelectAll = function () {};
+
+        class_4.prototype.markSelectPartial = function () {};
+
+        class_4.prototype.markSelectAllNotDisabled = function () {};
+
+        class_4.prototype.markDeselect = function () {};
+
+        class_4.prototype.activate = function () {};
+
+        class_4.prototype.deactivate = function () {};
+
+        return class_4;
       }();
 
       FilterMultiSelect.EventType = {
@@ -991,6 +1123,7 @@
       if (typeof args.filterText === 'undefined') args.filterText = 'Filter';
       if (typeof args.selectAllText === 'undefined') args.selectAllText = 'Select All';
       if (typeof args.labelText === 'undefined') args.labelText = '';
+      if (typeof args.selectionLimit === 'undefined') args.selectionLimit = 0;
       if (typeof args.caseSensitive === 'undefined') args.caseSensitive = false;
       if (typeof args.allowEnablingAndDisabling === 'undefined') args.allowEnablingAndDisabling = true;
       if (typeof args.items === 'undefined') args.items = new Array();

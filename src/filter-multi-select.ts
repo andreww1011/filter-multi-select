@@ -31,6 +31,7 @@ import FilterMultiSelect from './FilterMultiSelect';
     if (typeof args.filterText === 'undefined') args.filterText = 'Filter';
     if (typeof args.selectAllText === 'undefined') args.selectAllText = 'Select All';
     if (typeof args.labelText === 'undefined') args.labelText = '';
+    if (typeof args.selectionLimit === 'undefined') args.selectionLimit = 0;
     if (typeof args.caseSensitive === 'undefined') args.caseSensitive = false;
     if (typeof args.allowEnablingAndDisabling === 'undefined') args.allowEnablingAndDisabling = true;
     if (typeof args.items === 'undefined') args.items = new Array();

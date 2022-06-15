@@ -79,7 +79,7 @@
         <h4 class="col-12">Dropdown with pre-sets and case-sensitive filtering</h4>
       </div>
       <div class="form-group row">
-        <!-- <label class="col-2 col-form-label" for="shapes">Shapes</label> -->
+        <label class="col-2 col-form-label" for="shapes"></label>
         <div class="col-10">
           <select multiple name="shapes" id="shapes">
             <option value="1" selected>Square</option>
@@ -195,6 +195,39 @@
           </select>
         </div>
       </div>
+      <div class="row">
+        <h4 class="col-12">Single Select</h4>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="colors">Colors</label>
+        <div class="col-10">
+          <select name="colors" id="colors">
+            <option value="1">Red</option>
+            <option value="2">Orange</option>
+            <option value="3">Yellow</option>
+            <option value="4" disabled>Green</option>
+            <option value="5">Blue</option>
+            <option value="6">Indigo</option>
+            <option value="7">Violet</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <h4 class="col-12">Limit Selection Count</h4>
+      </div>
+      <div class="form-group row">
+        <label class="col-2 col-form-label" for="trees">Trees</label>
+        <div class="col-10">
+          <select multiple name="trees" id="trees">
+            <option value="1">Oak</option>
+            <option value="2" selected disabled>Pine</option>
+            <option value="3" selected >Maple</option>
+            <option value="4" disabled>Poplar</option>
+            <option value="5">Beech</option>
+            <option value="6">Magnolia</option>
+          </select>
+        </div>
+      </div>
       <button type="submit">Submit Form</button>
     </form>
     <div class="container">
@@ -272,6 +305,10 @@
                   ["Singapore","c",true],
                   ["Berlin","d",true,true],
                  ],
+        });
+        var colors = $('#colors').filterMultiSelect();
+        var trees = $('#trees').filterMultiSelect({
+          selectionLimit: 3,
         });
         $('#jsonbtn1').click((e) => {
            var b = true;

@@ -22,6 +22,7 @@ interface Args {
     filterText: string,
     selectAllText: string,
     labelText: string,
+    selectionLimit: number,
     caseSensitive: boolean,
     allowEnablingAndDisabling: boolean,
     items: Array<[label: string, value: string, selected?: boolean, disabled?: boolean]>,
