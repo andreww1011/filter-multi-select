@@ -33,6 +33,8 @@ $.fn.filterMultiSelect = function (args) {
         args.selectAllText = 'Select All';
     if (typeof args.labelText === 'undefined')
         args.labelText = '';
+    if (typeof args.selectionLimit === 'undefined')
+        args.selectionLimit = 0;
     if (typeof args.caseSensitive === 'undefined')
         args.caseSensitive = false;
     if (typeof args.allowEnablingAndDisabling === 'undefined')
