@@ -66,6 +66,7 @@
     <li><code>filterText</code> - text to show in filter when empty.  <i>default="Filter"</i></li>
     <li><code>selectAllText</code> - label for the select all dropdown item.  <i>default="Select All"</i></li>
     <li><code>labelText</code> - label to display in the main dropdown.  <i>default=""</i></li>
+    <li><code>selectionLimit</code> - limit the number of items able to be selected.  Choosing <small><code>1</code></small> or omitting the <small><code>multiple</code></small> attribute turns this into a single select.  A value of <small><code>0</code></small> means no limit.  <i>default="0"</i></li>
     <li><code>caseSensitive</code> - whether filtering is case-sensitive.  <i>default=false</i></li>
     <li><code>allowEnablingAndDisabling</code> - whether programmatically toggling disabled is permitted.  <i>default=true</i></li>
     <li><code>items</code> - array of additional items to append to options in dropdown.  Each array entry should have the form: <br />
