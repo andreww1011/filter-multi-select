@@ -1,6 +1,6 @@
 {
   "name": "filter-multi-select",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Multiple select dropdown with filter jQuery plugin.",
   "scripts": {
     "clean": "rimraf dist && rimraf coverage",
