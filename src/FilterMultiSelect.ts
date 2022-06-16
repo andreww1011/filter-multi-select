@@ -454,7 +454,7 @@ export default class FilterMultiSelect {
                                     0; //magic number 
         const numOptions: number = this.options.length;
         const restrictSelection: boolean = this.maxNumSelectedItems > 0 && this.maxNumSelectedItems < numOptions;
-        this.maxNumSelectedItems = restrictSelection ? this.maxNumSelectedItems : numOptions + 1;
+        this.maxNumSelectedItems = restrictSelection ? this.maxNumSelectedItems : numOptions + 1;  //magic number
         this.selectAllOption = restrictSelection ? 
                 new FilterMultiSelect.RestrictedSelectAllOption(this, name, args.selectAllText) : 
                 new FilterMultiSelect.UnrestrictedSelectAllOption(this, name, args.selectAllText);
@@ -532,6 +532,12 @@ export default class FilterMultiSelect {
         this.selectionCounter.className = 'mr-2';
 
         this.div.className = 'filter-multi-select dropdown';
+        if (this.maxNumSelectedItems > 1) {
+            let v: string = this.maxNumSelectedItems >= this.options.length ? "" : this.maxNumSelectedItems.toString();
+            this.div.setAttribute('multiple',v);
+        } else {
+            this.div.setAttribute('single',"");
+        }
 
         if (this.isDisabled()) {
             this.disableNoPermissionCheck();
