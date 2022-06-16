@@ -177,7 +177,8 @@
 
         var numOptions = this.options.length;
         var restrictSelection = this.maxNumSelectedItems > 0 && this.maxNumSelectedItems < numOptions;
-        this.maxNumSelectedItems = restrictSelection ? this.maxNumSelectedItems : numOptions + 1;
+        this.maxNumSelectedItems = restrictSelection ? this.maxNumSelectedItems : numOptions + 1; //magic number
+
         this.selectAllOption = restrictSelection ? new FilterMultiSelect.RestrictedSelectAllOption(this, name, args.selectAllText) : new FilterMultiSelect.UnrestrictedSelectAllOption(this, name, args.selectAllText); // filter box
 
         this.filterInput = document.createElement('input');
@@ -293,6 +294,13 @@
         this.label.className = 'col-form-label mr-2 text-dark';
         this.selectionCounter.className = 'mr-2';
         this.div.className = 'filter-multi-select dropdown';
+
+        if (this.maxNumSelectedItems > 1) {
+          var v = this.maxNumSelectedItems >= this.options.length ? "" : this.maxNumSelectedItems.toString();
+          this.div.setAttribute('multiple', v);
+        } else {
+          this.div.setAttribute('single', "");
+        }
 
         if (this.isDisabled()) {
           this.disableNoPermissionCheck();
